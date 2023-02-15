@@ -1,4 +1,4 @@
-# tsinglan_gpa
+# Tsinglan GPA Calculator
 
 By Mark Song
 
@@ -14,5 +14,4 @@ Run code
 
 `python score.py`
 
-<!-- readme: collaborators,contributors -start -->
-<!-- readme: collaborators,contributors -end -->
+The output would be a percentage score for each course.
