@@ -2,6 +2,8 @@
 
 By Mark Song
 
+Credit on: BChen
+
 ## Calculate your gpa
 
 Edit row 18 - 37 to your user account.
