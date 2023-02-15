@@ -17,20 +17,20 @@ import math
 
 # Payload when submitting the login request
 payload = {
-    "name": "aaaaaaaaaa",
-    "password": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-    "timestamp": aaaaaaaaaa,
+    "name": "chennuoyou",
+    "password": "028C2E3A2F9AC0B5B75DB86D4032D388",
+    "timestamp": 1676444247,
     "isWeekPassword": 0,
     "LanguageType": 1
 }
 
-# Uncomment the following to fetch the grade of 2022-2023 first semester
+# Uncomment the following to fetch the grade of 2022-2023 second semester
 semesterId = "21208"
 beginTime = "2023-01-27"
 endTime = "2023-08-26"
 
-# Uncomment the following to fetch the grade of 2021-2022 second semester
-# semesterId = "21207"
+# Uncomment the following to fetch the grade of 2021-2022 first semester
+ #semesterId = "21207"
 # beginTime = "2022-08-29"
 # endTime = "2023-01-26"
 
