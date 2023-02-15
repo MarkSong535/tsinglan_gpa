@@ -17,9 +17,9 @@ import math
 
 # Payload when submitting the login request
 payload = {
-    "name": "aaaaaaa",
-    "password": "aaaaaa",
-    "timestamp": aaaaaa,
+    "name": "songzixuan",
+    "password": "C8B1ACE8EBDAE45BA27DFE60D80E2053",
+    "timestamp": 1676385109,
     "isWeekPassword": 0,
     "LanguageType": 1
 }
