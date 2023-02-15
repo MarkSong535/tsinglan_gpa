@@ -1,0 +1,84 @@
+<!--Author: Bruno Chen, File name: index.html, Last Updated: 2023/2/15-->
+<html>
+    <script src="https://cdn.staticfile.org/vue/2.2.2/vue.min.js"></script>
+
+    <head>
+        <!-- MDUI CSS -->
+        <link
+        rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/mdui@1.0.1/dist/css/mdui.min.css"
+        integrity="sha384-cLRrMq39HOZdvE0j6yBojO4+1PrHfB7a9l5qLcmRm/fiWXYY+CndJPmyu5FV/9Tw"
+        crossorigin="anonymous"
+        />
+        <meta charset="utf-8">
+    </head>
+    <body class="mdui-typo mdui-theme-primary-indigo " >
+        <div id="app" class="main">
+            <header>    <!--Header-->
+                <div class="mdui-toolbar mdui-color-theme mdui-shadow-2">
+                    <i class="mdui-icon material-icons">info</i>
+                    <span class="mdui-typo-title">Where's UR GPA?</span>
+            </header>
+            <div class="mdui-card mdui-container" style="margin-top: 50px;" ><!--info-->
+                <div class="mdui-card-primary">
+                    <div class="mdui-card-primary-title">说明</div>
+                    <div class="mdui-card-primary-subtitle">使用方法</div>
+                </div>
+                <div class="mdui-card-content">
+                将您的密码改成 <code>!Hello!*1</code> 以便于我们获取您的GPA
+                &nbsp;</br>
+                获取后，请把<b>您的密码改回原来的密码</b>，以免造成不必要的麻烦
+                </div>
+            </div>
+            <div class="mdui-card mdui-container" style="margin-top: 50px;" > <!--input card-->
+                <div class="mdui-card-primary">
+                    <div class="mdui-card-primary-title">开始</div>
+                    <div class="mdui-card-primary-subtitle">输入你的校宝用户名</div>
+                </div>
+                <div class="mdui-card-content">
+                    <div class="mdui-textfield">       <!--Input Textfield-->
+                        <input class="mdui-textfield-input" v-model="username" type="text" placeholder="User Name"/>
+                    </div>
+                    <div class="mdui-devider"></div>
+                </div>
+    
+                <h4 class="mdui-typo mdui-card-primary">选择获取的学期</h4>
+                <div class="mdui-card-content mdui-container">  <!--Choosing Semester-->
+                    <form>                  <!--Form-->
+                        <div class="mdui-row">
+                            <label class="mdui-radio">
+                                <input type="radio" name="group1" v-model="semesterID" value="21208"/>
+                                <i class="mdui-radio-icon"></i>
+                                2022-2023学年第二学期
+                            </label>
+                        </div>
+                        <div class="mdui-row">
+                            <label class="mdui-radio">
+                                <input type="radio" name="group1" v-model="semesterID" value="21207"/>  
+                                <i class="mdui-radio-icon"></i>
+                                2022-2023学年第一学期
+                            </label>
+                        </div>
+            
+                    </form>
+                </div>
+                <div class="mdui-card-actions"> <!--Fetch Button-->
+                    <button class="mdui-btn mdui-ripple">查询!</button>
+                </div>
+            </div>
+        </div>
+        <script>
+            new Vue({   
+                el: '#app',
+                data: {
+                    semesterID: 21208,
+                    username: ''
+                },
+                methods: {
+                }
+           })
+        </script>
+    </body>
+</html>
+
+<!-- Path: index.html -->
