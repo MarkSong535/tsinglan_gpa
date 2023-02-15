@@ -252,7 +252,7 @@ with requests.Session() as s:
         for i in range(len_):
             dis = True
             gpa = get_gpa(tasks_by_subject[i])
-            if("AP" in subs_p[i]) or ("A Level" in subs_p[i]) or ("Linear Algebra" in subs_p[i]):
+            if("AP" in subs_p[i]) or ("A Level" in subs_p[i]) or ("Linear Algebra" in subs_p[i]) or ("AS" in subs_p[i]):
                 gpa = percentage_to_weight(gpa,True)
             elif ("Physical Education" in subs_p[i]) or (is_contains_chinese(subs_p[i])) or ("PE" in subs_p[i]):
                 dis = False
