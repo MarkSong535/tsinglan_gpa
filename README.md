@@ -20,8 +20,11 @@ Run code
 
 The output would be a percentage score for each course.
 
+[Detailed Instructions](https://marksong.tech/works/tls/tls_gpa/)
+
 
 Contributors:
 
 [@Mark Song](https://marksong.tech) the owner of this repository.
 [@Bruno Chen](https://github.com/BChen233) contributor
+
