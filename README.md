@@ -1,8 +1,10 @@
 # Tsinglan GPA Calculator
 
-By Mark Song
-
-Credit on: BChen
+<p align="center">
+  <a href="./LICENSE">
+    <img src="https://img.shields.io/badge/license-GNU%20AGPLv3-blue"/>
+  </a>
+</p>
 
 ## Calculate your gpa
 
@@ -17,3 +19,9 @@ Run code
 `python score.py`
 
 The output would be a percentage score for each course.
+
+
+Contributors:
+
+[@Mark Song](https://marksong.tech) the owner of this repository.
+[@Bruno Chen](https://github.com/BChen233) contributor
