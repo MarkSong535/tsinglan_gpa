@@ -26,5 +26,7 @@ The output would be a percentage score for each course.
 Contributors:
 
 [@Mark Song](https://marksong.tech) the owner of this repository.
-[@Bruno Chen](https://github.com/BChen233) contributor
+[@Bruno Chen](https://github.com/BChen233) Frontend Developer
+
+
 
