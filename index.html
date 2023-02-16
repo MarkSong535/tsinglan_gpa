@@ -10,6 +10,7 @@
         />
         <script src="https://cdn.staticfile.org/vue/2.2.2/vue.min.js"></script>
         <meta charset="utf-8">
+        <title>Where's UR GPA? - Beta</title>
     </head>
 
     
@@ -35,8 +36,12 @@
                 </div>
                 <div class="mdui-card-content">
                 将您的密码改成 <code>!Hello!*1</code> 以便于我们获取您的GPA
-                &nbsp;</br>
+                </br>
                 获取后，请把<b>您的密码改回原来的密码</b>，以免造成不必要的麻烦
+                
+                </br>
+                </br>
+                By: Mark Song and Bruno Chen
                 </div>
             </div>
 
@@ -52,7 +57,10 @@
                     </div>
                     <div class="mdui-devider"></div>
                 </div>
-                <h4 class="mdui-typo mdui-card-primary">选择获取的学期</h4>
+                <div class="mdui-card-actions" style="padding-left: 20px;">
+                    <h4>选择获取的学期</h4>
+                    <div class="mdui-card-primary-subtitle">查询后，请稍等一会，不要多次点击</div>
+                </div>
                 <div class="mdui-card-content mdui-container">  <!--Choosing Semester-->
                     <form> <!--Form-->
                         <div class="mdui-row">
@@ -114,11 +122,14 @@
                         {
                             const response = await fetch(url, options);
                             const data = await response.json();
+                            delete data.err;
+                            delete data.status;
                             console.log(data);
                             this.scoreString = data
                             //  returned data
                         } catch (e) {
                             console.error(e);
+                            this.scoreString=("出现错误，请检查您的输入是否正确,或联系开发者");
                         }
                     } 
                 }
