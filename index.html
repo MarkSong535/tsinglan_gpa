@@ -1,141 +1,147 @@
 <!--Author: Bruno Chen, File name: index.html, Last Updated: 2023/2/15-->
 <html>
-    <head>
-        <!-- MDUI CSS -->
-        <link
-        rel="stylesheet"
-        href="https://cdn.jsdelivr.net/npm/mdui@1.0.1/dist/css/mdui.min.css"
-        integrity="sha384-cLRrMq39HOZdvE0j6yBojO4+1PrHfB7a9l5qLcmRm/fiWXYY+CndJPmyu5FV/9Tw"
-        crossorigin="anonymous"
-        />
-        <script src="https://cdn.staticfile.org/vue/2.2.2/vue.min.js"></script>
-        <meta charset="utf-8">
-        <title>Where's UR GPA? - Beta</title>
-    </head>
 
-    
+<head>
+    <!-- MDUI CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/mdui@1.0.1/dist/css/mdui.min.css" integrity="sha384-cLRrMq39HOZdvE0j6yBojO4+1PrHfB7a9l5qLcmRm/fiWXYY+CndJPmyu5FV/9Tw" crossorigin="anonymous" />
+    <script src="https://cdn.staticfile.org/vue/2.2.2/vue.min.js"></script>
+    <meta charset="utf-8">
+    <title>Where's UR GPA? - Beta</title>
+</head>
 
-    <body class="mdui-typo mdui-theme-primary-indigo" style="padding-top: 40px;" >
-        <div id="app" class="main">
-            
 
-            <header>    <!--Header-->
-                <div class="mdui-appbar-fixed mdui-appbar">
-                    <div class="mdui-toolbar mdui-color-theme mdui-shadow-2">
-                        <i class="mdui-icon material-icons">info</i>
-                        <span class="mdui-typo-title">Where's UR GPA?</span>
-                    </div>
+
+<body class="mdui-typo mdui-theme-primary-indigo" style="padding-top: 40px;">
+    <div id="app" class="main">
+
+
+        <header>
+            <!--Header-->
+            <div class="mdui-appbar-fixed mdui-appbar">
+                <div class="mdui-toolbar mdui-color-theme mdui-shadow-2">
+                    <i class="mdui-icon material-icons">info</i>
+                    <span class="mdui-typo-title">Where's UR GPA?</span>
                 </div>
-            </header>
+            </div>
+        </header>
 
 
-            <div class="mdui-card mdui-container" style="margin-top: 50px;" ><!--info-->
-                <div class="mdui-card-primary">
-                    <div class="mdui-card-primary-title">说明</div>
-                    <div class="mdui-card-primary-subtitle">使用方法</div>
-                </div>
-                <div class="mdui-card-content">
+        <div class="mdui-card mdui-container" style="margin-top: 50px;">
+            <!--info-->
+            <div class="mdui-card-primary">
+                <div class="mdui-card-primary-title">说明</div>
+                <div class="mdui-card-primary-subtitle">使用方法</div>
+            </div>
+            <div class="mdui-card-content">
                 将您的密码改成 <code>!Hello!*1</code> 以便于我们获取您的GPA
                 </br>
                 获取后，请把<b>您的密码改回原来的密码</b>，以免造成不必要的麻烦
-                
+
                 </br>
                 </br>
                 By: Mark Song and Bruno Chen
-                </div>
             </div>
-
-
-            <div class="mdui-card mdui-container" style="margin-top: 50px;" > <!--input card-->
-                <div class="mdui-card-primary">
-                    <div class="mdui-card-primary-title">开始</div>
-                    <div class="mdui-card-primary-subtitle">输入您的校宝用户名</div>
-                </div>
-                <div class="mdui-card-content">
-                    <div class="mdui-textfield">     <!--Input Textfield-->
-                        <input class="mdui-textfield-input" v-model="username" type="text" placeholder="Input your Username"/>
-                    </div>
-                    <div class="mdui-devider"></div>
-                </div>
-                <div class="mdui-card-actions" style="padding-left: 20px;">
-                    <h4>选择获取的学期</h4>
-                    <div class="mdui-card-primary-subtitle">查询后，请稍等一会，不要多次点击</div>
-                </div>
-                <div class="mdui-card-content mdui-container">  <!--Choosing Semester-->
-                    <form> <!--Form-->
-                        <div class="mdui-row">
-                            <label class="mdui-radio">
-                                <input type="radio" name="group1" v-model="semesterID" value="21208"/>
-                                <i class="mdui-radio-icon"></i>
-                                2022-2023学年第二学期
-                            </label>
-                        </div>
-                        <div class="mdui-row">
-                            <label class="mdui-radio">
-                                <input type="radio" name="group1" v-model="semesterID" value="21207"/>  
-                                <i class="mdui-radio-icon"></i>
-                                2022-2023学年第一学期
-                            </label>
-                        </div>
-            
-                    </form>
-                </div>
-                <div class="mdui-card-actions"> <!--Fetch Button-->
-                    <button class="mdui-btn mdui-ripple mdui-color-theme" @click="fetchData(username,semesterID)">查询</button>
-                </div>
-            </div>
-
-
-            <div class="mdui-card mdui-container" style="margin-top: 50px; margin-bottom: 50px;">
-                <div class="mdui-card-primary">
-                    <div class="mdui-card-primary-title">输出</div>
-                    <div class="mdui-card-primary-subtitle">查看您的成绩</div>
-                    <div class="mdui-card-content" v-if="scoreString === ''">
-                        <div class="mdui-textfield" style="margin-bottom: 20px;">
-                           <h3><center>暂无结果</center></h3>
-                          </div>
-                    </div>
-                    <div class="mdui-card-content" v-else>
-                        <div class="mdui-textfield">
-                            <textarea class="mdui-textfield-input" rows=20 placeholder="">{{this.scoreString}}</textarea>
-                          </div>
-                    </div>
-                </div>
-            </div>            
         </div>
 
 
-        <script>
-            new Vue({   
-                el: '#app',
-                data: {
-                    semesterID: 21208,
-                    username: '',
-                    scoreString: ''
-                },
-                methods: {
-                    async fetchData()
-                    {
-                        const url = `https://score_api.marksong.tech${this.username}&sid=${this.semesterID}`;
-                        const options = { mode: 'cors'};
-                        try 
-                        {
-                            const response = await fetch(url, options);
-                            const data = await response.json();
-                            delete data.err;
-                            delete data.status;
-                            console.log(data);
-                            this.scoreString = data
-                            //  returned data
-                        } catch (e) {
-                            console.error(e);
-                            this.scoreString=("出现错误，请检查您的输入是否正确,或联系开发者");
-                        }
-                    } 
+        <div class="mdui-card mdui-container" style="margin-top: 50px;">
+            <!--input card-->
+            <div class="mdui-card-primary">
+                <div class="mdui-card-primary-title">开始</div>
+                <div class="mdui-card-primary-subtitle">输入您的校宝用户名</div>
+            </div>
+            <div class="mdui-card-content">
+                <div class="mdui-textfield">
+                    <!--Input Textfield-->
+                    <input class="mdui-textfield-input" v-model="username" type="text" placeholder="Input your Username" />
+                </div>
+                <div class="mdui-devider"></div>
+            </div>
+            <div class="mdui-card-actions" style="padding-left: 20px;">
+                <h4>选择获取的学期</h4>
+                <div class="mdui-card-primary-subtitle">查询后，请稍等一会，不要多次点击</div>
+            </div>
+            <div class="mdui-card-content mdui-container">
+                <!--Choosing Semester-->
+                <form>
+                    <!--Form-->
+                    <div class="mdui-row">
+                        <label class="mdui-radio">
+                            <input type="radio" name="group1" v-model="semesterID" value="21208" />
+                            <i class="mdui-radio-icon"></i>
+                            2022-2023学年第二学期
+                        </label>
+                    </div>
+                    <div class="mdui-row">
+                        <label class="mdui-radio">
+                            <input type="radio" name="group1" v-model="semesterID" value="21207" />
+                            <i class="mdui-radio-icon"></i>
+                            2022-2023学年第一学期
+                        </label>
+                    </div>
+
+                </form>
+            </div>
+            <div class="mdui-card-actions">
+                <!--Fetch Button-->
+                <button class="mdui-btn mdui-ripple mdui-color-theme" @click="fetchData(username,semesterID)">查询</button>
+            </div>
+        </div>
+
+
+        <div class="mdui-card mdui-container" style="margin-top: 50px; margin-bottom: 50px;">
+            <div class="mdui-card-primary">
+                <div class="mdui-card-primary-title">输出</div>
+                <div class="mdui-card-primary-subtitle">查看您的成绩</div>
+                <div class="mdui-card-content" v-if="scoreString === ''">
+                    <div class="mdui-textfield" style="margin-bottom: 20px;">
+                        <h3>
+                            <center>暂无结果</center>
+                        </h3>
+                    </div>
+                </div>
+                <div class="mdui-card-content" v-else>
+                    <div class="mdui-textfield">
+                        <textarea class="mdui-textfield-input" rows=20 placeholder="">{{this.scoreString}}</textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        new Vue({
+            el: '#app',
+            data: {
+                semesterID: 21208,
+                username: '',
+                scoreString: ''
+            },
+            methods: {
+                async fetchData() {
+                    const url = `https://score_api.marksong.tech/?${this.username}&sid=${this.semesterID}`;
+                    const options = {
+                        mode: 'cors'
+                    };
+                    try {
+                        const response = await fetch(url, options);
+                        const data = await response.json();
+                        delete data.err;
+                        delete data.status;
+                        console.log(data);
+                        this.scoreString = data
+                        //  returned data
+                    } catch (e) {
+                        console.error(e);
+                        this.scoreString = ("出现错误，请检查您的输入是否正确,或联系开发者");
+                    }
                 }
-           })
-        </script>
-    </body>
+            }
+        })
+    </script>
+</body>
+
 </html>
 
 <!-- Path: index.html -->
