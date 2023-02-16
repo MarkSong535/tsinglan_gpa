@@ -1,7 +1,5 @@
 <!--Author: Bruno Chen, File name: index.html, Last Updated: 2023/2/15-->
 <html>
-    <script src="https://cdn.staticfile.org/vue/2.2.2/vue.min.js"></script>
-
     <head>
         <!-- MDUI CSS -->
         <link
@@ -10,15 +8,26 @@
         integrity="sha384-cLRrMq39HOZdvE0j6yBojO4+1PrHfB7a9l5qLcmRm/fiWXYY+CndJPmyu5FV/9Tw"
         crossorigin="anonymous"
         />
+        <script src="https://cdn.staticfile.org/vue/2.2.2/vue.min.js"></script>
         <meta charset="utf-8">
     </head>
-    <body class="mdui-typo mdui-theme-primary-indigo " >
+
+    
+
+    <body class="mdui-typo mdui-theme-primary-indigo" style="padding-top: 40px;" >
         <div id="app" class="main">
+            
+
             <header>    <!--Header-->
-                <div class="mdui-toolbar mdui-color-theme mdui-shadow-2">
-                    <i class="mdui-icon material-icons">info</i>
-                    <span class="mdui-typo-title">Where's UR GPA?</span>
+                <div class="mdui-appbar-fixed mdui-appbar">
+                    <div class="mdui-toolbar mdui-color-theme mdui-shadow-2">
+                        <i class="mdui-icon material-icons">info</i>
+                        <span class="mdui-typo-title">Where's UR GPA?</span>
+                    </div>
+                </div>
             </header>
+
+
             <div class="mdui-card mdui-container" style="margin-top: 50px;" ><!--info-->
                 <div class="mdui-card-primary">
                     <div class="mdui-card-primary-title">说明</div>
@@ -30,21 +39,22 @@
                 获取后，请把<b>您的密码改回原来的密码</b>，以免造成不必要的麻烦
                 </div>
             </div>
+
+
             <div class="mdui-card mdui-container" style="margin-top: 50px;" > <!--input card-->
                 <div class="mdui-card-primary">
                     <div class="mdui-card-primary-title">开始</div>
-                    <div class="mdui-card-primary-subtitle">输入你的校宝用户名</div>
+                    <div class="mdui-card-primary-subtitle">输入您的校宝用户名</div>
                 </div>
                 <div class="mdui-card-content">
-                    <div class="mdui-textfield">       <!--Input Textfield-->
-                        <input class="mdui-textfield-input" v-model="username" type="text" placeholder="User Name"/>
+                    <div class="mdui-textfield">     <!--Input Textfield-->
+                        <input class="mdui-textfield-input" v-model="username" type="text" placeholder="Input your Username"/>
                     </div>
                     <div class="mdui-devider"></div>
                 </div>
-    
                 <h4 class="mdui-typo mdui-card-primary">选择获取的学期</h4>
                 <div class="mdui-card-content mdui-container">  <!--Choosing Semester-->
-                    <form>                  <!--Form-->
+                    <form> <!--Form-->
                         <div class="mdui-row">
                             <label class="mdui-radio">
                                 <input type="radio" name="group1" v-model="semesterID" value="21208"/>
@@ -63,18 +73,54 @@
                     </form>
                 </div>
                 <div class="mdui-card-actions"> <!--Fetch Button-->
-                    <button class="mdui-btn mdui-ripple">查询!</button>
+                    <button class="mdui-btn mdui-ripple mdui-color-theme" @click="fetchData(username,semesterID)">查询</button>
                 </div>
             </div>
+
+
+            <div class="mdui-card mdui-container" style="margin-top: 50px; margin-bottom: 50px;">
+                <div class="mdui-card-primary">
+                    <div class="mdui-card-primary-title">输出</div>
+                    <div class="mdui-card-primary-subtitle">查看您的成绩</div>
+                    <div class="mdui-card-content" v-if="scoreString === ''">
+                        <div class="mdui-textfield" style="margin-bottom: 20px;">
+                           <h3><center>暂无结果</center></h3>
+                          </div>
+                    </div>
+                    <div class="mdui-card-content" v-else>
+                        <div class="mdui-textfield">
+                            <textarea class="mdui-textfield-input" rows=20 placeholder="">{{this.scoreString}}</textarea>
+                          </div>
+                    </div>
+                </div>
+            </div>            
         </div>
+
+
         <script>
             new Vue({   
                 el: '#app',
                 data: {
                     semesterID: 21208,
-                    username: ''
+                    username: '',
+                    scoreString: ''
                 },
                 methods: {
+                    async fetchData()
+                    {
+                        const url = `http://bwh.marksong.tech:3000/?name=${this.username}&sid=${this.semesterID}`;
+                        const options = { mode: 'cors'};
+                        try 
+                        {
+                            const response = await fetch(url, options);
+                            const data = await response.json();
+                            console.log(data);
+                            this.scoreString = data
+                            //  returned data
+                        } catch (e) {
+                            console.error(e);
+                        }
+                    } 
                 }
            })
         </script>
