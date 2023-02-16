@@ -24,14 +24,17 @@ function formatDate(date) {
     );
 }
 
+function log(ip, msg){
+    console.log(ip+" "+formatDate(new Date())+" "+msg)
+}
 
 http.createServer(function(req, res) {
-
-
     var q = url.parse(req.url, true)
     var params = q.query;
     var access = q.pathname;
-    console.log(formatDate(new Date())+" access to "+q.path)
+    var access_ip = req.headers['cf-connecting-ip'];
+
+    log(access_ip,"access to "+q.path);
     if(access.startsWith("/fet/") || access==="/fet"){
         res.writeHead(200, {
             'Content-Type': 'application/json',
@@ -40,10 +43,10 @@ http.createServer(function(req, res) {
         if ((!params) || (!params.name) || (!params.sid)) {
             res.write("{\"err\": true, \"status\": true}");
             res.end();
-            console.log(formatDate(new Date())+" lack of info")
+            log(access_ip,"lack of info");
         } else {
             if(!params.type){
-                console.log('python3 /Users/marksong/Project/tsinglan_gpa/score.py ' + params.name + ' ' + params.sid)
+                log(access_ip,'python3 /Users/marksong/Project/tsinglan_gpa/score.py ' + params.name + ' ' + params.sid)
                 const {
                     spawn
                 } = require('child_process')
@@ -56,13 +59,12 @@ http.createServer(function(req, res) {
                     data_string = data.toString();
                     if (data_string.charAt(0) == '{') {
                         res.write(data_string);
-                        data_string += '\n' +
+                        data_string +=
                             params.name + ' ' + params.sid + ' ';
-                        data_string += formatDate(new Date());
-                        console.log(data_string);
+                        log(access_ip,data_string);
                     } else {
                         res.write("{\"err\": true, \"status\": true}");
-                        console.log(formatDate(new Date())+" bad python")
+                        log(access_ip,"bad python");
                     }
                     res.end();
                 });
@@ -75,7 +77,7 @@ http.createServer(function(req, res) {
                     const command = spawn('echo \"' + params.name + ' ' + params.sid+'\" >> /Users/marksong/Project/tsinglan_gpa/transactions/requests', {
                         shell: true
                     })
-                    console.log(formatDate(new Date())+' echo \"' + params.name + ' ' + params.sid+'\" >> /Users/marksong/Project/tsinglan_gpa/transactions/requests')
+                    log(access_ip,'echo \"' + params.name + ' ' + params.sid+'\" >> /Users/marksong/Project/tsinglan_gpa/transactions/requests')
                     // command.stdout.on('data', data => {
                     //     console.log(formatDate(new Date())+" safe");
                     //     res.write("{'rstatus':true}");
@@ -85,7 +87,7 @@ http.createServer(function(req, res) {
                     command.stderr.on('data', data =>{
                         res.write("{\'rstatus\':true}");
                         res.end();
-                        console.log(formatDate(new Date())+" error while writing");
+                        log(access_ip,"error while writing");
                     });
                 }else if(params.type==1){
                     res.write("fetch to proxy");
@@ -109,7 +111,7 @@ http.createServer(function(req, res) {
         }
         filename = access.slice(5);
         filename = "/Users/marksong/Project/tsinglan_gpa/html_assests/" + filename;
-        console.log(formatDate(new Date())+" want to read "+filename)
+        log(access_ip,"want to read "+filename)
         if(fs.existsSync(filename)){
             fs.readFile(filename, function(err, data) {
                 res.writeHead(200, {'Content-Type': 'text/html'});
@@ -122,6 +124,7 @@ http.createServer(function(req, res) {
         }
     }else if(access==="/"){
         filename = "/Users/marksong/Project/tsinglan_gpa/index.html"
+        log(access_ip,"want to read "+filename)
         if(fs.existsSync(filename)){
             fs.readFile(filename, function(err, data) {
                 res.writeHead(200, {'Content-Type': 'text/html'});
