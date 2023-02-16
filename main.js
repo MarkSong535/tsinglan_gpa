@@ -34,14 +34,14 @@ http.createServer(function(req, res) {
     if ((!params) || (!params.name) || (!params.sid)) {
         res.write("{\"err\": true, \"status\": true}");
         res.end();
-        console.log(formatDate(new Date())+" lack of info")
+        console.log(formatDate(new Date()) + " lack of info")
     } else {
-        console.log('python3 /root/course/score.py ' + params.name + ' ' + params.sid)
+        console.log('python3 /Users/marksong/Project/tsinglan_gpa/score.py ' + params.name + ' ' + params.sid)
         const {
             spawn
         } = require('child_process')
 
-        const command = spawn('python3 /root/course/score.py ' + params.name + ' ' + params.sid, {
+        const command = spawn('python3 /Users/marksong/Project/tsinglan_gpa/score.py ' + params.name + ' ' + params.sid, {
             shell: true
         })
 
@@ -55,11 +55,11 @@ http.createServer(function(req, res) {
                 console.log(data_string);
             } else {
                 res.write("{\"err\": true, \"status\": true}");
-                console.log(formatDate(new Date())+" bad python")
+                console.log(formatDate(new Date()) + " bad python")
             }
             res.end();
         });
     }
 
 
-}).listen(3000);
+}).listen(3100);
