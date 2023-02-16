@@ -8,8 +8,6 @@
 
 ## Calculate your gpa
 
-Edit row 18 - 37 to your user account.
-
 Install prerequisits
 
 `pip install requests`
