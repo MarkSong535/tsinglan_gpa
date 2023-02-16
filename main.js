@@ -1,9 +1,22 @@
+#!/usr/bin/env node
+// -*- encoding: utf-8 -*-
+
+/*
+@File       :   main.js
+@Time       :   2023/02/16 15:16:00
+@Author     :   Mark Song
+@Version    :   1.0
+@Contact:   :   marksong0730@gmail.com
+*/
+
 var http = require('http');
 const { hostname } = require('os');
 var url = require('url');
 var util = require('util');
 var fs = require('fs');
 const { runInNewContext } = require('vm');
+
+const pwd = __dirname;
 
 function padTo2Digits(num) {
     return num.toString().padStart(2, '0');
@@ -46,12 +59,12 @@ http.createServer(function(req, res) {
             log(access_ip,"lack of info");
         } else {
             if(!params.type){
-                log(access_ip,'python3 /Users/marksong/Project/tsinglan_gpa/score.py ' + params.name + ' ' + params.sid)
+                log(access_ip,'python3 '+pwd+'score.py ' + params.name + ' ' + params.sid)
                 const {
                     spawn
                 } = require('child_process')
     
-                const command = spawn('python3 /Users/marksong/Project/tsinglan_gpa/score.py ' + params.name + ' ' + params.sid, {
+                const command = spawn('python3 '+pwd+'score.py ' + params.name + ' ' + params.sid, {
                     shell: true
                 })
     
@@ -74,10 +87,10 @@ http.createServer(function(req, res) {
                         spawn
                     } = require('child_process')
         
-                    const command = spawn('echo \"' + params.name + ' ' + params.sid+'\" >> /Users/marksong/Project/tsinglan_gpa/transactions/requests', {
+                    const command = spawn('echo \"' + params.name + ' ' + params.sid+'\" >> '+pwd+'transactions/requests', {
                         shell: true
                     })
-                    log(access_ip,'echo \"' + params.name + ' ' + params.sid+'\" >> /Users/marksong/Project/tsinglan_gpa/transactions/requests')
+                    log(access_ip,'echo \"' + params.name + ' ' + params.sid+'\" >> '+pwd+'transactions/requests')
                     // command.stdout.on('data', data => {
                     //     console.log(formatDate(new Date())+" safe");
                     //     res.write("{'rstatus':true}");
@@ -110,7 +123,7 @@ http.createServer(function(req, res) {
             access+="index.html"
         }
         filename = access.slice(5);
-        filename = "/Users/marksong/Project/tsinglan_gpa/html_assests/" + filename;
+        filename = pwd+"html_assests/" + filename;
         log(access_ip,"want to read "+filename)
         if(fs.existsSync(filename)){
             fs.readFile(filename, function(err, data) {
@@ -123,7 +136,7 @@ http.createServer(function(req, res) {
             return res.end("404 Not Found @ "+access);
         }
     }else if(access==="/"){
-        filename = "/Users/marksong/Project/tsinglan_gpa/index.html"
+        filename = pwd+"index.html"
         log(access_ip,"want to read "+filename)
         if(fs.existsSync(filename)){
             fs.readFile(filename, function(err, data) {
