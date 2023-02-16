@@ -1,6 +1,7 @@
 var http = require('http');
 var url = require('url');
 var util = require('util');
+const { runInNewContext } = require('vm');
 
 function padTo2Digits(num) {
     return num.toString().padStart(2, '0');
@@ -36,30 +37,59 @@ http.createServer(function(req, res) {
         res.end();
         console.log(formatDate(new Date())+" lack of info")
     } else {
-        console.log('python3 /root/course/score.py ' + params.name + ' ' + params.sid)
-        const {
-            spawn
-        } = require('child_process')
+        if(!params.type){
+            console.log('python3 /Users/marksong/Project/tsinglan_gpa/score.py ' + params.name + ' ' + params.sid)
+            const {
+                spawn
+            } = require('child_process')
 
-        const command = spawn('python3 /root/course/score.py ' + params.name + ' ' + params.sid, {
-            shell: true
-        })
+            const command = spawn('python3 /Users/marksong/Project/tsinglan_gpa/score.py ' + params.name + ' ' + params.sid, {
+                shell: true
+            })
 
-        command.stdout.on('data', data => {
-            data_string = data.toString();
-            if (data_string.charAt(0) == '{') {
-                res.write(data_string);
-                data_string += '\n' +
-                    params.name + ' ' + params.sid + ' ';
-                data_string += formatDate(new Date());
-                console.log(data_string);
-            } else {
-                res.write("{\"err\": true, \"status\": true}");
-                console.log(formatDate(new Date())+" bad python")
+            command.stdout.on('data', data => {
+                data_string = data.toString();
+                if (data_string.charAt(0) == '{') {
+                    res.write(data_string);
+                    data_string += '\n' +
+                        params.name + ' ' + params.sid + ' ';
+                    data_string += formatDate(new Date());
+                    console.log(data_string);
+                } else {
+                    res.write("{\"err\": true, \"status\": true}");
+                    console.log(formatDate(new Date())+" bad python")
+                }
+                res.end();
+            });
+        }else{
+            if(params.type==0){
+                const {
+                    spawn
+                } = require('child_process')
+    
+                const command = spawn('echo \"' + params.name + ' ' + params.sid+'\" >> /Users/marksong/Project/tsinglan_gpa/transactions/requests', {
+                    shell: true
+                })
+                console.log(formatDate(new Date())+' echo \"' + params.name + ' ' + params.sid+'\" >> /Users/marksong/Project/tsinglan_gpa/transactions/requests')
+                // command.stdout.on('data', data => {
+                //     console.log(formatDate(new Date())+" safe");
+                //     res.write("{'rstatus':true}");
+            
+                //     res.end();
+                // });
+                command.stderr.on('data', data =>{
+                    res.write("{\'rstatus\':true}");
+                    res.end();
+                    console.log(formatDate(new Date())+" error while writing");
+                });
+            }else if(params.type==1){
+                res.write("fetch to proxy");
+            }else{
+                res.write("{'rstatus':false}");
             }
             res.end();
-        });
+        }
     }
 
 
-}).listen(3000);
+}).listen(3100);
