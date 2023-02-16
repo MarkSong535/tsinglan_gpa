@@ -30,7 +30,7 @@ The output would be a percentage score for each course.
 
 ### Calculate using deployed website
 
-[link to site](http://score_api.marksong.tech/)
+[link to site](http://score.marksong.tech/)
 
 ## Contributors:
 
