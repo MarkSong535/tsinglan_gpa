@@ -2,4 +2,5 @@ test.py
 /transactions/
 *.json
 /node_modules/
-/html_assests/
+/html_assests/*
+!/html_assests/index.html
