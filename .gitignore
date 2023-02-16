@@ -3,5 +3,4 @@ test.py
 *.json
 /node_modules/
 /html_assests/*
-/pro/
 test.js

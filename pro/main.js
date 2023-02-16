@@ -18,8 +18,6 @@ const { runInNewContext } = require('vm');
 
 const pwd = __dirname.substr(0, __dirname.length-3);
 
-console.log(pwd)
-
 function padTo2Digits(num) {
     return num.toString().padStart(2, '0');
 }
@@ -97,10 +95,11 @@ http.createServer(function(req, res) {
                             console.error(err)
                         }
                         log(access_ip,'echo \"' + params.name + ' ' + params.sid+'\" >> '+filename);
-                        res.write("{\"rstatus\":false}");
+                        res.write("{\"rstatus\":true}");
                         const command1 = spawn('nohup python3 '+pwd+'score2.py '+pwd+'transactions/requests'+params.name+' &', {
                             shell: true
                         })
+                        log(access_ip,'nohup python3 '+pwd+'score2.py '+pwd+'transactions/requests'+params.name+' &')
                         return res.end();
                     }else{
                         const {
@@ -113,7 +112,7 @@ http.createServer(function(req, res) {
                             console.error(err)
                         }
                         log(access_ip,'echo \"' + params.name + ' ' + params.pass + ' ' + params.sid+'\" >> '+filename);
-                        res.write("{\"rstatus\":false}");
+                        res.write("{\"rstatus\":true}");
                         const command1 = spawn('nohup python3 '+pwd+'score3.py '+pwd+'transactions/requests'+params.name+' &', {
                             shell: true
                         })
