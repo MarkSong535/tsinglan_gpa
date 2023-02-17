@@ -59,6 +59,13 @@
                     <form> <!--Form-->
                         <div class="mdui-row">
                             <label class="mdui-radio">
+                                <input type="radio" name="group1" v-model="semesterID" value="0"/>
+                                <i class="mdui-radio-icon"></i>
+                                当前学期
+                            </label>
+                        </div>
+                        <div class="mdui-row">
+                            <label class="mdui-radio">
                                 <input type="radio" name="group1" v-model="semesterID" value="21208"/>
                                 <i class="mdui-radio-icon"></i>
                                 2022-2023学年第二学期
@@ -121,7 +128,7 @@
             <div class="footer-copyright">
                 <div class="container">
                     Copyright (C) 2023 Tsinglan IT Advanced Lab</br>
-                    Under GNU Affero General Public License v3.0
+                    <a href="https://github.com/MarkSong535/tsinglan_gpa/blob/main/LICENSE">Under GNU Affero General Public License v3.0</a>
                 </div>
             </div>
           </footer>
@@ -138,8 +145,8 @@
                 },
                 methods: {
                     async fetchData() {
-                        const url1 = `https://score_api.marksong.tech/fet?name=${this.username}&pass=${this.password}&sid=${this.semesterID}&type=0`;
-                        const url2 = `https://score_api.marksong.tech/fet?name=${this.username}&pass=${this.password}&sid=${this.semesterID}&type=1`;
+                        const url1 = `https://score.marksong.tech/fet?name=${this.username}&pass=${this.password}&sid=${this.semesterID}&type=0`;
+                        const url2 = `https://score.marksong.tech/fet?name=${this.username}&pass=${this.password}&sid=${this.semesterID}&type=1`;
                         try 
                         {
                             // Check if the username is valid
