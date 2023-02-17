@@ -1,11 +1,10 @@
 #!/usr/bin/env python
 # -*- encoding: utf-8 -*-
 '''
-@File       :   score.py
-@Time       :   2023/02/15 20:14:30
+@File       :   score2.py
+@Time       :   2023/02/15 16:34:00
 @Author     :   Mark Song
-@Coauthor   :   Bruno Chen
-@Version    :   1.1
+@Version    :   2.0
 @Contact:   :   marksong0730@gmail.com
 '''
 

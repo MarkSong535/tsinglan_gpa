@@ -6,26 +6,36 @@
   </a>
 </p>
 
-## Calculate your gpa
+## Calculate your gpa by yourself
 
-Edit row 18 - 37 to your user account.
-
-Install prerequisits
+### Install prerequisits
 
 `pip install requests`
 
-Run code
+### Run code
 
-`python score.py`
+`python score.py username semeterid`
+
+`python score2.py /path/to/file` (this will take in file in the given path and output into same file)
+
+  In the file, write `username semesterid`
+
+`python score3.py /path/to/file` (no change in password required)
+
+  In the file, write `username password semesterid`
 
 The output would be a percentage score for each course.
 
 [Detailed Instructions](https://marksong.tech/works/tls/tls_gpa/)
 
+### Calculate using deployed website
 
-Contributors:
+[link to site](http://score.marksong.tech/)
 
-[@Mark Song](https://marksong.tech) the owner of this repository.
+## Contributors:
+
+[@Mark Song](https://marksong.tech) the owner of this repository, middleware and backend developer.
+
 [@Bruno Chen](https://github.com/BChen233) Frontend Developer
 
 
