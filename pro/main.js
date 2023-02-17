@@ -37,8 +37,8 @@ function formatDate(date) {
     );
 }
 
-function log(ip, msg){
-    console.log(ip+" "+formatDate(new Date())+" "+msg)
+function log(ip, msg,name){
+    // console.log(ip+" "+formatDate(new Date())+" "+msg);
 }
 
 http.createServer(function(req, res) {
@@ -46,8 +46,8 @@ http.createServer(function(req, res) {
     var params = q.query;
     var access = q.pathname;
     var access_ip = req.headers['cf-connecting-ip'];
-
-    log(access_ip,"access to "+q.path);
+    
+    log(access_ip,"access to "+q.path, 'null');
     if(access.startsWith("/fet/") || access==="/fet"){
         res.writeHead(200, {
             'Content-Type': 'application/json',
@@ -56,10 +56,10 @@ http.createServer(function(req, res) {
         if ((!params) || (!params.name) || (!params.sid)) {
             res.write("{\"err\": true, \"status\": true}");
             res.end();
-            log(access_ip,"lack of info");
+            log(access_ip,"lack of info",'null');
         } else {
             if(!params.type){
-                log(access_ip,'python3 '+pwd+'score.py ' + params.name + ' ' + params.sid)
+                log(access_ip,'python3 '+pwd+'score.py ' + params.name + ' ' + params.sid,params.name)
                 const {
                     spawn
                 } = require('child_process')
@@ -74,10 +74,10 @@ http.createServer(function(req, res) {
                         res.write(data_string);
                         data_string +=
                             params.name + ' ' + params.sid + ' ';
-                        log(access_ip,data_string);
+                        log(access_ip,data_string,params.name);
                     } else {
                         res.write("{\"err\": true, \"status\": true}");
-                        log(access_ip,"bad python");
+                        log(access_ip,"bad python",params.name);
                     }
                     res.end();
                 });
@@ -94,12 +94,12 @@ http.createServer(function(req, res) {
                         } catch (err){
                             console.error(err)
                         }
-                        log(access_ip,'echo \"' + params.name + ' ' + params.sid+'\" >> '+filename);
+                        log(access_ip,'echo \"' + params.name + ' ' + params.sid+'\" >> '+filename,params.name);
                         res.write("{\"rstatus\":true}");
                         const command1 = spawn('nohup python3 '+pwd+'score2.py '+pwd+'transactions/requests'+params.name+' &', {
                             shell: true
                         })
-                        log(access_ip,'nohup python3 '+pwd+'score2.py '+pwd+'transactions/requests'+params.name+' &')
+                        log(access_ip,'nohup python3 '+pwd+'score2.py '+pwd+'transactions/requests'+params.name+' &',params.name)
                         return res.end();
                     }else{
                         const {
@@ -111,12 +111,12 @@ http.createServer(function(req, res) {
                         } catch (err){
                             console.error(err)
                         }
-                        log(access_ip,'echo \"' + params.name + ' ' + params.pass + ' ' + params.sid+'\" >> '+filename);
+                        log(access_ip,'echo \"' + params.name + ' ' + params.pass + ' ' + params.sid+'\" >> '+filename,params.name);
                         res.write("{\"rstatus\":true}");
                         const command1 = spawn('nohup python3 '+pwd+'score3.py '+pwd+'transactions/requests'+params.name+' &', {
                             shell: true
                         })
-                        log(access_ip,'nohup python3 '+pwd+'score3.py '+pwd+'transactions/requests'+params.name+' &')
+                        log(access_ip,'nohup python3 '+pwd+'score3.py '+pwd+'transactions/requests'+params.name+' &',params.name)
                         return res.end();
                     }
                 }else if(params.type==1){
@@ -131,7 +131,7 @@ http.createServer(function(req, res) {
                             }else{
                                 res.write("{\"rstatus\":false}");
                             }
-                            log(access_ip, data);
+                            log(access_ip, data,params.name);
                             return res.end();
                         });
                     }else{
@@ -146,11 +146,38 @@ http.createServer(function(req, res) {
             }
         }
     }else if(access==="/"){
+        access = access.substring(1);
         filename = pwd+"index.html"
-        log(access_ip,"want to read "+filename)
+        log(access_ip,"want to read "+filename,'null')
         if(fs.existsSync(filename)){
             fs.readFile(filename, function(err, data) {
                 res.writeHead(200, {'Content-Type': 'text/html'});
+                res.write(data);
+                return res.end();
+            });
+        }else{
+            res.writeHead(404, {'Content-Type': 'text/html'});
+            return res.end("404 Not Found @ "+access);
+        }
+    }else if(access.startsWith("/ico/")){
+        filename = pwd+"favicon.ico"
+        log(access_ip,"want to read "+filename,'null')
+        if(fs.existsSync(filename)){
+            fs.readFile(filename, function(err, data) {
+                res.writeHead(200, {'Content-Type': 'image/x-icon'});
+                res.write(data);
+                return res.end();
+            });
+        }else{
+            res.writeHead(404, {'Content-Type': 'text/html'});
+            return res.end("404 Not Found @ "+access);
+        }
+    }else if(access==="/favicon.ico"){
+        filename = pwd+"ico/favicon.ico"
+        log(access_ip,"want to read "+filename,'null')
+        if(fs.existsSync(filename)){
+            fs.readFile(filename, function(err, data) {
+                res.writeHead(200, {'Content-Type': 'image/x-icon'});
                 res.write(data);
                 return res.end();
             });
