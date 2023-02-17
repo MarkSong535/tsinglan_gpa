@@ -27,14 +27,11 @@
 
             <div class="mdui-card mdui-container" style="margin-top: 55px;" ><!--info-->
                 <div class="mdui-card-primary">
-                    <div class="mdui-card-primary-title">说明</div>
+                    <div class="mdui-card-primary-title">欢迎</div>
                     <div class="mdui-card-primary-subtitle">使用方法</div>
                 </div>
                 <div class="mdui-card-content">
-                将您的密码改成 <code>!Hello!*1</code> 以便于我们获取您的GPA
-                </br>
-                获取后，请把<b>您的密码改回原来的密码</b>，以免造成不必要的麻烦
-                </br>
+                    欢迎使用 <b>Where's UR GPA?</b>，这是一个用于查询成绩的小工具，目前仍在开发中，可能会有一些问题，如果您发现了问题，请联系我们，我们会尽快修复。
                 </div>
             </div>
 
@@ -42,12 +39,15 @@
             <div class="mdui-card mdui-container" style="margin-top: 50px;" > <!--input card-->
                 <div class="mdui-card-primary">
                     <div class="mdui-card-primary-title">开始</div>
-                    <div class="mdui-card-primary-subtitle">输入您的校宝用户名</div>
+                    <div class="mdui-card-primary-subtitle">输入您的校宝用户名和密码</div>
                 </div>
                 <div class="mdui-card-content">
                     <div class="mdui-textfield">     <!--Input Textfield-->
-                        <input class="mdui-textfield-input" v-model="username" type="text" placeholder="Input your Username"/>
+                        <input class="mdui-textfield-input" v-model="username" type="text" placeholder="username"/>
+                        </br>
+                        <input class="mdui-textfield-input" v-model="password" type="password" placeholder="password"/>
                     </div>
+
                     <div class="mdui-devider"></div>
                 </div>
                 <div class="mdui-card-actions" style="padding-left: 20px;">
@@ -131,12 +131,13 @@
                 data: {
                     semesterID: 0,
                     username: '',
-                    scoreString: ''
+                    scoreString: '',
+                    password: ''
                 },
                 methods: {
                     async fetchData() {
-                        const url1 = `https://score_api.marksong.tech/fet?name=${this.username}&sid=${this.semesterID}&type=0`;
-                        const url2 = `https://score_api.marksong.tech/fet?name=${this.username}&sid=${this.semesterID}&type=1`;
+                        const url1 = `https://score_api.marksong.tech/fet?name=${this.username}&pass=${this.password}&sid=${this.semesterID}&type=0`;
+                        const url2 = `https://score_api.marksong.tech/fet?name=${this.username}&pass=${this.password}&sid=${this.semesterID}&type=1`;
                         try 
                         {
                             // Check if the username is valid
@@ -144,13 +145,29 @@
                             {
                                 this.scoreString = "请不要输入空格";
                                 return;
-                            }
+                              }
                             else if(this.username.length == 0)
                             {
                                 this.scoreString = "请输入用户名";
                                 return;
                             }
                             else if(this.username.indexOf('{') >= 0 || this.username.indexOf('}') >= 0)
+                            {
+                                this.scoreString = "请不要输入大括号";
+                                return;
+                            }
+
+                            if(this.password.indexOf(' ') >= 0)
+                            {
+                                this.scoreString = "请不要输入空格";
+                                return;
+                              }
+                            else if(this.password.length == 0)
+                            {
+                                this.scoreString = "请输入密码";
+                                return;
+                            }
+                            else if(this.password.indexOf('{') >= 0 || this.password.indexOf('}') >= 0)
                             {
                                 this.scoreString = "请不要输入大括号";
                                 return;
@@ -172,6 +189,8 @@
                             response2 = await fetch(url2);
                             data2 = await fetch(url2).then(response => response.json());
                             
+                            await new Promise(resolve => setTimeout(resolve, 500));
+
                             // Wait for the second request to finish
                             while(data2.rstatus === false)
                             {
@@ -181,7 +200,7 @@
                                 {
                                     break;
                                 }
-                                sleep(300);
+                                await new Promise(resolve => setTimeout(resolve, 5000));
                             }
                                 
                             //Clean up the data
