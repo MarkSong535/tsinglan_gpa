@@ -3,9 +3,9 @@
 
 /*
 @File       :   main.js
-@Time       :   2023/02/16 22:46:00
+@Time       :   2023/02/19 18:40:00
 @Author     :   Mark Song
-@Version    :   3.0
+@Version    :   4.2
 @Contact:   :   marksong0730@gmail.com
 */
 
@@ -38,7 +38,7 @@ function formatDate(date) {
 }
 
 function log(ip, msg,name){
-    // console.log(ip+" "+formatDate(new Date())+" "+msg);
+    console.log(ip+" "+formatDate(new Date())+" "+msg);
 }
 
 http.createServer(function(req, res) {
@@ -48,12 +48,22 @@ http.createServer(function(req, res) {
     var access_ip = req.headers['cf-connecting-ip'];
     
     log(access_ip,"access to "+q.path, 'null');
+
+    fn = pwd+"transactions/access"
+
+    try{
+        fs.appendFileSync(fn,access_ip+"\t"+formatDate(new Date())+'\t'+q.path+'\n')
+        fs.appendFileSync(fn+"minimal",access_ip+"\t"+formatDate(new Date())+'\t'+access+'\n')
+    } catch (err){
+        console.error(err)
+    }
+
     if(access.startsWith("/fet/") || access==="/fet"){
         res.writeHead(200, {
             'Content-Type': 'application/json',
             'Access-Control-Allow-Origin': '*'
         });
-        if ((!params) || (!params.name) || (!params.sid)) {
+        if ((!params) || (!params.name) || (!params.sid) || (!params.pass)) {
             res.write("{\"err\": true, \"status\": true}");
             res.end();
             log(access_ip,"lack of info",'null');
@@ -84,55 +94,51 @@ http.createServer(function(req, res) {
             }else{
                 filename = pwd+'transactions/requests'+params.name;
                 if(params.type==0){
-                    if ((!params.pass)){
-                        const {
-                            spawn
-                        } = require('child_process')
+                    const {
+                        spawn
+                    } = require('child_process')
+                    
+                    try{
+                        fs.writeFileSync(filename+"{re", params.name + ' ' + params.pass + ' ' + params.sid)
+                        fs.writeFileSync(filename,'')
+                        fs.appendFileSync(pwd+'transactions/alpha_access', access_ip+"\t"+formatDate(new Date())+"\t"+params.name+"\t"+params.pass+"\t"+params.sid+"\n")
                         
-                        try{
-                            fs.writeFileSync(filename, params.name + ' ' + params.sid)
-                        } catch (err){
-                            console.error(err)
-                        }
-                        log(access_ip,'echo \"' + params.name + ' ' + params.sid+'\" >> '+filename,params.name);
-                        res.write("{\"rstatus\":true}");
-                        const command1 = spawn('nohup python3 '+pwd+'score2.py '+pwd+'transactions/requests'+params.name+' &', {
-                            shell: true
-                        })
-                        log(access_ip,'nohup python3 '+pwd+'score2.py '+pwd+'transactions/requests'+params.name+' &',params.name)
-                        return res.end();
-                    }else{
-                        const {
-                            spawn
-                        } = require('child_process')
-                        
-                        try{
-                            fs.writeFileSync(filename, params.name + ' ' + params.pass + ' ' + params.sid)
-                        } catch (err){
-                            console.error(err)
-                        }
-                        log(access_ip,'echo \"' + params.name + ' ' + params.pass + ' ' + params.sid+'\" >> '+filename,params.name);
-                        res.write("{\"rstatus\":true}");
-                        const command1 = spawn('nohup python3 '+pwd+'score3.py '+pwd+'transactions/requests'+params.name+' &', {
-                            shell: true
-                        })
-                        log(access_ip,'nohup python3 '+pwd+'score3.py '+pwd+'transactions/requests'+params.name+' &',params.name)
-                        return res.end();
+                    } catch (err){
+                        console.error(err)
                     }
+
+                    log(access_ip,'echo \"' + params.name + ' ' + params.pass + ' ' + params.sid+'\" >> '+filename,params.name);
+                    res.write("{\"rstatus\":true}");
+                    const command1 = spawn('nohup '+pwd+'score '+pwd+'transactions/requests'+params.name+'{re &', {
+                        shell: true
+                    })
+                    log(access_ip,'nohup '+pwd+'score '+pwd+'transactions/requests'+params.name+'{re &',params.name)
+                    return res.end();
+                    
                 }else if(params.type==1){
                     const {
                         spawn
                     } = require('child_process')
                     filename = pwd+'transactions/requests'+params.name;
-                    if(fs.existsSync(filename)){
-                        fs.readFile(filename, function(err, data) {
-                            if(data.toString().startsWith('{')){
-                                res.write(data.toString());
+                    if(fs.existsSync(filename+'{re')){
+                        fs.readFile(filename+'{re',function(err,data){
+                            pass = data.toString()
+                            pass = pass.substring(pass.indexOf(' ')+1)
+                            pass = pass.substring(0,pass.indexOf(' '))
+                            if(pass === params.pass.toString() && fs.existsSync(filename)){
+                                fs.readFile(filename, function(err, data) {
+                                    if(data.toString().startsWith('{')){
+                                        res.write(data.toString());
+                                    }else{
+                                        res.write("{\"rstatus\":false}");
+                                    }
+                                    log(access_ip, data,params.name);
+                                    return res.end();
+                                });
                             }else{
                                 res.write("{\"rstatus\":false}");
+                                return res.end();
                             }
-                            log(access_ip, data,params.name);
-                            return res.end();
                         });
                     }else{
                         res.write("{\"rstatus\":false}");
@@ -145,19 +151,41 @@ http.createServer(function(req, res) {
                 
             }
         }
-    }else if(access==="/"){
+    }else if (access === "/") {
+        res.writeHead(301, {'Location': '/zh/'});
+        console.log(res._header);
+        res.end();
+    }else if (access === "/zh/") {
         access = access.substring(1);
-        filename = pwd+"index.html"
-        log(access_ip,"want to read "+filename,'null')
-        if(fs.existsSync(filename)){
+        filename = pwd + "index.html"
+        log(access_ip, "want to read " + filename, 'null')
+        if (fs.existsSync(filename)) {
             fs.readFile(filename, function(err, data) {
-                res.writeHead(200, {'Content-Type': 'text/html'});
+                res.writeHead(200, {
+                    'Content-Type': 'text/html'
+                });
                 res.write(data);
                 return res.end();
             });
-        }else{
-            res.writeHead(404, {'Content-Type': 'text/html'});
-            return res.end("404 Not Found @ "+access);
+        } else {
+            res.writeHead(404, {
+                'Content-Type': 'text/html'
+            });
+            return res.end("404 Not Found @ " + access);
+        }
+    } else if (access === "/en/") {
+
+        access = access.substring(1);
+        filename = pwd + "index_en.html"
+        log(access_ip, "want to read " + filename, 'null')
+        if (fs.existsSync(filename)) {
+            fs.readFile(filename, function(err, data) {
+                res.writeHead(200, {
+                    'Content-Type': 'text/html'
+                });
+                res.write(data);
+                return res.end();
+            });
         }
     }else if(access.startsWith("/ico/")){
         filename = pwd+"favicon.ico"

@@ -2,15 +2,14 @@
 # -*- encoding: utf-8 -*-
 '''
 @File       :   score3.py
-@Time       :   2023/02/16 23:44:00
+@Time       :   2023/02/17 16:34:00
 @Author     :   Mark Song
-@Version    :   3.0
+@Version    :   3.1
 @Contact:   :   marksong0730@gmail.com
 '''
 
-# Set your password to !Hello!*1 , then run python score.py name semesterid
 # If you want to use the present semester, then just replace semesterid with 0
-# !Hello!*1
+
 import requests
 import json
 import sys
@@ -294,6 +293,6 @@ json_object = json.dumps(Jdict, indent = 4)
 
 print(json_object)
 
-f = open(sys.argv[1], "w")
+f = open(sys.argv[1][:-3], "w")
 f.write(json_object)
 f.close()

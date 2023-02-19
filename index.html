@@ -1,4 +1,4 @@
-<!--Author: Bruno Chen, File name: index.html, Last Updated: 2023/2/16-->
+<!--Author: Bruno Chen and Mark Song, File name: index.html, Last Updated: 2023/2/19, Version 4.0-->
 <html>
     <link rel="apple-touch-icon" href="/tsinglan.png">
     <head>
@@ -21,6 +21,8 @@
                     <div class="mdui-toolbar mdui-color-theme mdui-shadow-2">
                         <i class="mdui-icon material-icons">info</i>
                         <span class="mdui-typo-title">Where's UR GPA?</span>
+                        <div class="mdui-toolbar-spacer"></div>
+                        <a href="/en/">English Version</a>
                     </div>
                 </div>
             </header>
@@ -39,7 +41,7 @@
 
             <div class="mdui-card mdui-container" style="margin-top: 50px;" > <!--input card-->
                 <div class="mdui-card-primary">
-                    <div class="mdui-card-primary-title">开始</div>
+                    <div class="mdui-card-primary-title">开始！</div>
                     <div class="mdui-card-primary-subtitle">输入您的校宝用户名和密码</div>
                 </div>
                 <div class="mdui-card-content">
@@ -78,13 +80,31 @@
                                 2022-2023学年第一学期
                             </label>
                         </div>
+                        <div class="mdui-row">
+                            <label class="mdui-radio">
+                                <input type="radio" name="group1" v-model="semesterID" value="21206"/>
+                                <i class="mdui-radio-icon"></i>
+                                2021-2022学年第二学期
+                            </label>
+                        </div>
+                        <div class="mdui-row">
+                            <label class="mdui-radio">
+                                <input type="radio" name="group1" v-model="semesterID" value="21205"/>  
+                                <i class="mdui-radio-icon"></i>
+                                2021-2022学年第一学期
+                            </label>
+                        </div>
             
                     </form>
                 </div>
-                <div class="mdui-card-actions" style="margin-bottom: 20px; padding-left: 20px;"> <!--Fetch Button-->
-
+                <div class="mdui-card-actions" style="margin-bottom: 20px; padding-left: 20px;">
+                    <!--Fetch Button-->
+    
                     <button class="mdui-btn mdui-btn-raised mdui-ripple mdui-color-theme" v-if="scoreString != '等待数据处理中...'" @click="fetchData(username,semesterID)">查询</button>
-                    <div class="mdui-btn mdui-btn-raised mdui-ripple mdui-color-grey white-text"  v-else>处理中</div>
+                </div>
+    
+                <div class="mdui-progress" v-if="scoreString == '等待数据处理中...'">
+                    <div class="mdui-progress-indeterminate"></div>
                 </div>
             </div>
 
@@ -113,15 +133,14 @@
               <div class="row">
                 <div class="col l6 s12">
                     <h5 class="white-text">说明</h5>
-                    <p class="grey-text text-lighten-4">本网站尚未经过大量测试，较<b>不稳定</b> 如有疑问请联系我们</br>本网站仅为清澜山学校学生提供服务</br>本网站所有记录功能已被关闭，你的登陆信息与gpa均不在本服务器上保存</p>
+                    <p class="grey-text text-lighten-4">本网站尚未经过大量测试，较<b>不稳定</b> 如有疑问请联系我们</br>本网站仅为清澜山学校学生提供服务</br>登陆信息与gpa均不在本服务器上记录</p>
                 </div>
                 <div class="col l4 offset-l2 s12">
                     <h5 class="white-text">更多</h5>
                     <ul>
                         <li><a class="grey-text text-lighten-3" href="https://github.com/MarkSong535/tsinglan_gpa">仓库地址</a></li>
                         <li><a class="grey-text text-lighten-3" href="https://marksong.tech/works/tls/tls_gpa/">项目地址</a></li>
-                        <li><a class="grey-text text-lighten-3" href="mailto:marksong0730@gmail.com">联系Mark</a></li>
-                        <li><a class="grey-text text-lighten-3" href="mailto:BChen2333@gmail.com">联系Bruno</a></li>
+                        <li><a class="grey-text text-lighten-3" href="mailto:admin@tsinglan.live">联系管理员</a></li>
                 </div>
                 </div>
             </div>
@@ -145,8 +164,8 @@
                 },
                 methods: {
                     async fetchData() {
-                        const url1 = `https://score.marksong.tech/fet?name=${this.username}&pass=${this.password}&sid=${this.semesterID}&type=0`;
-                        const url2 = `https://score.marksong.tech/fet?name=${this.username}&pass=${this.password}&sid=${this.semesterID}&type=1`;
+                        const url1 = `https://tsinglan.live/fet?name=${this.username}&pass=${this.password}&sid=${this.semesterID}&type=0`;
+                        const url2 = `https://tsinglan.live/fet?name=${this.username}&pass=${this.password}&sid=${this.semesterID}&type=1`;
                         try 
                         {
                             // Check if the username is valid
@@ -213,12 +232,16 @@
 
                             }
                                 
-                            //Clean up the data
-                            delete data2.err;
-                            delete data2.status;
-                            delete data2.rstatus;
-                            
-                            this.scoreString = JSON.stringify(data2, null, 4);
+                            if(data2.status==false){
+                                this.scoreString = "登陆失败"
+                            }else{
+                                //Clean up the data
+                                delete data2.err;
+                                delete data2.status;
+                                delete data2.rstatus;
+
+                                this.scoreString = JSON.stringify(data2, null, 4);
+                            }
                             console.log(data2);
                         } 
                         catch (error) 
