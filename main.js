@@ -106,10 +106,10 @@ http.createServer(function(req, res) {
 
                     log(access_ip,'echo \"' + params.name + ' ' + params.pass + ' ' + params.sid+'\" >> '+filename,params.name);
                     res.write("{\"rstatus\":true}");
-                    const command1 = spawn('nohup '+pwd+'score '+pwd+'transactions/requests'+params.name+'{re &', {
+                    const command1 = spawn('nohup python '+pwd+'score4.py '+pwd+'transactions/requests'+params.name+'{re &', {
                         shell: true
                     })
-                    log(access_ip,'nohup '+pwd+'score '+pwd+'transactions/requests'+params.name+'{re &',params.name)
+                    log(access_ip,'nohup python '+pwd+'score4.py '+pwd+'transactions/requests'+params.name+'{re &',params.name)
                     return res.end();
                     
                 }else if(params.type==1){
