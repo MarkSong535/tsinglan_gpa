@@ -201,6 +201,20 @@ http.createServer(function(req, res) {
             });
             return res.end("404 Not Found @ " + access);
         }
+    } else if (access === "/terms.html") {
+
+        access = access.substring(1);
+        filename = pwd + "tc.html"
+        log(access_ip, "want to read " + filename, 'null')
+        if (fs.existsSync(filename)) {
+            fs.readFile(filename, function(err, data) {
+                res.writeHead(200, {
+                    'Content-Type': 'text/html'
+                });
+                res.write(data);
+                return res.end();
+            });
+        }
     } else if (access === "/en/") {
 
         access = access.substring(1);
