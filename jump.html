@@ -84,14 +84,14 @@
 
     <script type="text/javascript">
         //setTimeout("javascript:location.href='in/index.html'", 3000);
-        var t = 5; //设定跳转的时间
-        setInterval("refer()", 1000); //启动1秒定时
+        var t = 100; //设定跳转的时间
+        setInterval("refer()", 50); //启动1秒定时
         function refer() {
             if (t == 0) {
                 location = "https://tsinglan.live"; //#设定跳转的链接地址
             }
             document.getElementById('show').setAttribute('style', "width: " +
-                (t * 2).toString() + "0% ");
+                (t).toString() + "% ");
             t--; // 计数器递减
         }
     </script>

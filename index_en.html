@@ -46,7 +46,7 @@
             <div class="mdui-card-primary">
                 <div class="mdui-card-primary-title">Welcome!</div>
 
-                <div class="mdui-card-primary-subtitle">Please enter your username and password</div>
+                <div class="mdui-card-primary-subtitle">Please enter your password</div>
             </div>
             <div class="mdui-card-content">
                 <div class="mdui-textfield">
@@ -173,8 +173,31 @@
             },
             methods: {
                 async fetchData() {
-                    const url1 = `https://tsinglan.live/fet?name=${this.username}&pass=${this.password}&sid=${this.semesterID}&type=0`;
-                    const url2 = `https://tsinglan.live/fet?name=${this.username}&pass=${this.password}&sid=${this.semesterID}&type=1`;
+                    const url = 'https://tsinglan.live/fet/'
+                    const req0 = {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify({
+                            name: this.username,
+                            pass: this.password,
+                            sid: this.semesterID,
+                            type: 0
+                        })
+                    };
+                    const req1 = {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify({
+                            name: this.username,
+                            pass: this.password,
+                            sid: this.semesterID,
+                            type: 1
+                        })
+                    };
                     try {
                         // Check if the username is valid
                         if (this.username.indexOf(' ') >= 0) {
@@ -185,6 +208,9 @@
                             return;
                         } else if (this.username.indexOf('{') >= 0 || this.username.indexOf('}') >= 0) {
                             this.scoreString = "Do not input bracket";
+                            return;
+                        } else if (this.username.indexOf('..') >= 0 || this.username.indexOf('..') >= 0) {
+                            this.scoreString = "Do not input ..";
                             return;
                         }
 
@@ -197,11 +223,14 @@
                         } else if (this.password.indexOf('{') >= 0 || this.password.indexOf('}') >= 0) {
                             this.scoreString = "Do not input bracket";
                             return;
+                        } else if (this.username.indexOf('..') >= 0 || this.username.indexOf('..') >= 0) {
+                            this.scoreString = "Do not input ..";
+                            return;
                         }
 
                         // Wait for the first request to finish
                         this.scoreString = "Processing..."
-                        const response1 = await fetch(url1);
+                        const response1 = await fetch(url, req0);
                         const data1 = await response1.json();
                         // Check the status returned by the first request
 
@@ -212,14 +241,14 @@
                         }
 
 
-                        response2 = await fetch(url2);
-                        data2 = await fetch(url2).then(response => response.json());
+                        //response2 = await fetch(url2);
+                        data2 = await fetch(url, req1).then(response => response.json());
 
-                        await new Promise(resolve => setTimeout(resolve, 500));
+                        await new Promise(resolve => setTimeout(resolve, 1000));
 
                         // Wait for the second request to finish
                         while (data2.rstatus === false) {
-                            response2 = await fetch(url2);
+                            response2 = await fetch(url, req1);
                             data2 = await response2.json();
                             if (data2.rstatus === true) {
                                 break;
@@ -228,11 +257,11 @@
 
                         }
 
-                        console.log(data2)
 
-                        if(data2.status==false){
+
+                        if (data2.status == false) {
                             this.scoreString = "Login Failed"
-                        }else{
+                        } else {
                             //Clean up the data
                             delete data2.err;
                             delete data2.status;
