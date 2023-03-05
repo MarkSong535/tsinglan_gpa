@@ -3,9 +3,9 @@
 
 /*
 @File       :   main.js
-@Time       :   2023/02/19 18:40:00
+@Time       :   2023/03/05 19:14:00
 @Author     :   Mark Song
-@Version    :   4.2
+@Version    :   4.3
 @Contact:   :   marksong0730@gmail.com
 */
 
@@ -76,7 +76,7 @@ http.createServer(function(req, res) {
     }
 
     try {
-        fs.appendFileSync(fn, access_ip + "\t" + formatDate(new Date()) + '\t' + req.method + ' ' +req.headers['x-forwarded-proto'] + '://' + req.headers.host + q.path + '\n')
+        fs.appendFileSync(fn, access_ip + "\t" + formatDate(new Date()) + '\t' + req.headers['x-forwarded-proto'] + '://' + req.headers.host + q.path + '\n')
         fs.appendFileSync(fn + "minimal", access_ip + "\t" + formatDate(new Date()) + '\t' + access + '\n')
     } catch (err) {
         console.error(err)
@@ -109,14 +109,15 @@ http.createServer(function(req, res) {
             } else {
                 body = querystring.parse(body)
             }
-            if ((body.name != undefined) && (body.pass != undefined) && (body.sid != undefined) && (body.type != undefined)) {
+            if ((body.name != undefined) && (body.pass != undefined) && (body.timestamp != undefined) && (body.sid != undefined) && (body.type != undefined)) {
                 if (body.type == 0) {
+                    var timestamp = String(new Date().getTime());
                     const {
                         spawn
                     } = require('child_process')
-                    filename = pwd + 'transactions/requests' + body.name
+                    filename = pwd + 'transactions/requests' + timestamp
                     try {
-                        fs.writeFileSync(filename + "{re", body.name + ' ' + body.pass + ' ' + body.sid)
+                        fs.writeFileSync(filename + "_cr", body.name + '\n' + body.pass + '\n' + body.sid)
                         fs.unlinkSync(filename)
                         // fs.appendFileSync(pwd+'transactions/alpha_access', access_ip+"\t"+formatDate(new Date())+"\t"+params.name+"\t"+params.sid+"\n")
 
@@ -124,28 +125,31 @@ http.createServer(function(req, res) {
                         console.error(err)
                     }
                     try {
-                        fs.appendFileSync(pwd + 'transactions/alpha_access', access_ip + "\t" + formatDate(new Date()) + "\t" + body.name + "\t" + body.sid + '\t' + req.method + ' ' +req.headers['x-forwarded-proto'] + '://' + req.headers.host + q.path + '\n')
+                        fs.appendFileSync(pwd + 'transactions/alpha_access', access_ip + "\t" + formatDate(new Date()) + "\t" + body.name + "\t" + body.sid + "\n")
                     } catch (err) {
                         console.error(err)
                     }
                     log(access_ip, 'echo \"' + body.name + ' ' + body.pass + ' ' + body.sid + '\" >> ' + filename, body.name);
-                    res.write("{\"rstatus\":true}");
-                    const command1 = spawn('nohup python ' + pwd + 'score4.py ' + pwd + 'transactions/requests' + body.name + '{re &', {
+                    console.log('nohup python ' + pwd + 'score5.py ' + filename + '_cr &')
+                    res.write("{\"rstatus\":true,\"timestamp\":\""+timestamp+"\"}");
+                    const command1 = spawn('nohup python ' + pwd + 'score5.py ' + filename + '_cr &', {
                         shell: true
                     })
-                    log(access_ip, 'nohup python ' + pwd + 'score4.py ' + pwd + 'transactions/requests' + body.name + '{re &', body.name)
+                    log(access_ip, 'nohup python ' + pwd + 'score5.py ' + filename + '_cr &', body.name)
                     return res.end();
                 } else {
 
                     const {
                         spawn
                     } = require('child_process')
-                    filename = pwd + 'transactions/requests' + body.name;
-                    if (fs.existsSync(filename + '{re')) {
-                        fs.readFile(filename + '{re', function(err, data) {
+                    filename = pwd + 'transactions/requests' + body.timestamp;
+                    console.log(filename)
+                    if (fs.existsSync(filename + '_cr')) {
+                        fs.readFile(filename + '_cr', function(err, data) {
                             pass = data.toString()
-                            pass = pass.substring(pass.indexOf(' ') + 1)
-                            pass = pass.substring(0, pass.indexOf(' '))
+                            pass = pass.substring(pass.indexOf('\n') + 1)
+                            pass = pass.substring(0, pass.indexOf('\n'))
+                            console.log(pass)
                             if (pass === body.pass.toString() && fs.existsSync(filename)) {
                                 fs.readFile(filename, function(err, data) {
                                     if (data.toString().startsWith('{')) {
@@ -154,7 +158,7 @@ http.createServer(function(req, res) {
                                         res.write("{\"rstatus\":false}");
                                     }
                                     fs.unlinkSync(filename)
-                                    fs.unlinkSync(filename + '{re')
+                                    fs.unlinkSync(filename + '_cr')
                                     log(access_ip, data, body.name);
                                     return res.end();
                                 });
@@ -201,20 +205,6 @@ http.createServer(function(req, res) {
             });
             return res.end("404 Not Found @ " + access);
         }
-    } else if (access === "/terms.html") {
-
-        access = access.substring(1);
-        filename = pwd + "tc.html"
-        log(access_ip, "want to read " + filename, 'null')
-        if (fs.existsSync(filename)) {
-            fs.readFile(filename, function(err, data) {
-                res.writeHead(200, {
-                    'Content-Type': 'text/html'
-                });
-                res.write(data);
-                return res.end();
-            });
-        }
     } else if (access === "/en/") {
 
         access = access.substring(1);
@@ -229,34 +219,27 @@ http.createServer(function(req, res) {
                 return res.end();
             });
         }
-    }else if(access.startsWith("/ico/")){
-        filename = pwd+"favicon.ico"
-        log(access_ip,"want to read "+filename,'null')
-        if(fs.existsSync(filename)){
+    } else if (access === "/favicon.ico") {
+        filename = pwd + "ico/favicon.ico"
+        log(access_ip, "want to read " + filename, 'null')
+        if (fs.existsSync(filename)) {
             fs.readFile(filename, function(err, data) {
-                res.writeHead(200, {'Content-Type': 'image/x-icon'});
+                res.writeHead(200, {
+                    'Content-Type': 'image/x-icon'
+                });
                 res.write(data);
                 return res.end();
             });
-        }else{
-            res.writeHead(404, {'Content-Type': 'text/html'});
-            return res.end("404 Not Found @ "+access);
-        }
-    }else if(access==="/favicon.ico"){
-        filename = pwd+"ico/favicon.ico"
-        log(access_ip,"want to read "+filename,'null')
-        if(fs.existsSync(filename)){
-            fs.readFile(filename, function(err, data) {
-                res.writeHead(200, {'Content-Type': 'image/x-icon'});
-                res.write(data);
-                return res.end();
+        } else {
+            res.writeHead(404, {
+                'Content-Type': 'text/html'
             });
-        }else{
-            res.writeHead(404, {'Content-Type': 'text/html'});
-            return res.end("404 Not Found @ "+access);
+            return res.end("404 Not Found @ " + access);
         }
-    }else{
-        res.writeHead(404, {'Content-Type': 'text/html'});
-        return res.end("404 Not Found @ "+access);
+    } else {
+        res.writeHead(404, {
+            'Content-Type': 'text/html'
+        });
+        return res.end("404 Not Found @ " + access);
     }
 }).listen(3100);

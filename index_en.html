@@ -1,4 +1,5 @@
 <!--Author: Bruno Chen and Mark Song, File name: index.html, Last Updated: 2023/2/19, Version 4.0-->
+<meta name="apple-mobile-web-app-capable" content="yes">
 <html>
 <link rel="apple-touch-icon" href="/tsinglan.png">
 
@@ -181,51 +182,40 @@
                         body: JSON.stringify({
                             name: this.username,
                             pass: this.password,
+                            timestamp: 0,
                             sid: this.semesterID,
                             type: 0
                         })
                     };
-                    const req1 = {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/json"
-                        },
-                        body: JSON.stringify({
-                            name: this.username,
-                            pass: this.password,
-                            sid: this.semesterID,
-                            type: 1
-                        })
-                    };
                     try {
                         // Check if the username is valid
-                        if (this.username.indexOf(' ') >= 0) {
-                            this.scoreString = "Do not input space";
-                            return;
-                        } else if (this.username.length == 0) {
-                            this.scoreString = "Please enter your username";
-                            return;
-                        } else if (this.username.indexOf('{') >= 0 || this.username.indexOf('}') >= 0) {
-                            this.scoreString = "Do not input bracket";
-                            return;
-                        } else if (this.username.indexOf('..') >= 0 || this.username.indexOf('..') >= 0) {
-                            this.scoreString = "Do not input ..";
-                            return;
-                        }
+                        // if (this.username.indexOf(' ') >= 0) {
+                        //     this.scoreString = "Do not input space";
+                        //     return;
+                        // } else if (this.username.length == 0) {
+                        //     this.scoreString = "Please enter your username";
+                        //     return;
+                        // } else if (this.username.indexOf('{') >= 0 || this.username.indexOf('}') >= 0) {
+                        //     this.scoreString = "Do not input bracket";
+                        //     return;
+                        // } else if (this.username.indexOf('..') >= 0 || this.username.indexOf('..') >= 0) {
+                        //     this.scoreString = "Do not input ..";
+                        //     return;
+                        // }
 
-                        if (this.password.indexOf(' ') >= 0) {
-                            this.scoreString = "Do not input space";
-                            return;
-                        } else if (this.password.length == 0) {
-                            this.scoreString = "Please enter your password";
-                            return;
-                        } else if (this.password.indexOf('{') >= 0 || this.password.indexOf('}') >= 0) {
-                            this.scoreString = "Do not input bracket";
-                            return;
-                        } else if (this.username.indexOf('..') >= 0 || this.username.indexOf('..') >= 0) {
-                            this.scoreString = "Do not input ..";
-                            return;
-                        }
+                        // if (this.password.indexOf(' ') >= 0) {
+                        //     this.scoreString = "Do not input space";
+                        //     return;
+                        // } else if (this.password.length == 0) {
+                        //     this.scoreString = "Please enter your password";
+                        //     return;
+                        // } else if (this.password.indexOf('{') >= 0 || this.password.indexOf('}') >= 0) {
+                        //     this.scoreString = "Do not input bracket";
+                        //     return;
+                        // } else if (this.username.indexOf('..') >= 0 || this.username.indexOf('..') >= 0) {
+                        //     this.scoreString = "Do not input ..";
+                        //     return;
+                        // }
 
                         // Wait for the first request to finish
                         this.scoreString = "Processing..."
@@ -239,6 +229,19 @@
                             return;
                         }
 
+                        const req1 = {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json"
+                            },
+                            body: JSON.stringify({
+                                name: this.username,
+                                pass: this.password,
+                                timestamp: data1.timestamp,
+                                sid: this.semesterID,
+                                type: 1
+                            })
+                        };
 
                         //response2 = await fetch(url2);
                         data2 = await fetch(url, req1).then(response => response.json());
@@ -255,8 +258,6 @@
                             await new Promise(resolve => setTimeout(resolve, 500));
 
                         }
-
-
 
                         if (data2.status == false) {
                             this.scoreString = "Login Failed"

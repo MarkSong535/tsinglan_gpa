@@ -1,4 +1,5 @@
 <!--Author: Bruno Chen and Mark Song, File name: index.html, Last Updated: 2023/2/19, Version 4.0-->
+<meta name="apple-mobile-web-app-capable" content="yes">
 <html>
 <link rel="apple-touch-icon" href="/tsinglan.png">
 
@@ -182,51 +183,40 @@
                         body: JSON.stringify({
                             name: this.username,
                             pass: this.password,
+                            timestamp: 0,
                             sid: this.semesterID,
                             type: 0
                         })
                     };
-                    const req1 = {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/json"
-                        },
-                        body: JSON.stringify({
-                            name: this.username,
-                            pass: this.password,
-                            sid: this.semesterID,
-                            type: 1
-                        })
-                    };
                     try {
                         // Check if the username is valid
-                        if (this.username.indexOf(' ') >= 0) {
-                            this.scoreString = "请不要输入空格";
-                            return;
-                        } else if (this.username.length == 0) {
-                            this.scoreString = "请输入用户名";
-                            return;
-                        } else if (this.username.indexOf('{') >= 0 || this.username.indexOf('}') >= 0) {
-                            this.scoreString = "请不要输入大括号";
-                            return;
-                        } else if (this.username.indexOf('..') >= 0 || this.username.indexOf('..') >= 0) {
-                            this.scoreString = "请不要输入..";
-                            return;
-                        }
+                        // if (this.username.indexOf(' ') >= 0) {
+                        //     this.scoreString = "请不要输入空格";
+                        //     return;
+                        // } else if (this.username.length == 0) {
+                        //     this.scoreString = "请输入用户名";
+                        //     return;
+                        // } else if (this.username.indexOf('{') >= 0 || this.username.indexOf('}') >= 0) {
+                        //     this.scoreString = "请不要输入大括号";
+                        //     return;
+                        // } else if (this.username.indexOf('..') >= 0 || this.username.indexOf('..') >= 0) {
+                        //     this.scoreString = "请不要输入..";
+                        //     return;
+                        // }
 
-                        if (this.password.indexOf(' ') >= 0) {
-                            this.scoreString = "请不要输入空格";
-                            return;
-                        } else if (this.password.length == 0) {
-                            this.scoreString = "请输入密码";
-                            return;
-                        } else if (this.password.indexOf('{') >= 0 || this.password.indexOf('}') >= 0) {
-                            this.scoreString = "请不要输入大括号";
-                            return;
-                        } else if (this.username.indexOf('..') >= 0 || this.username.indexOf('..') >= 0) {
-                            this.scoreString = "请不要输入..";
-                            return;
-                        }
+                        // if (this.password.indexOf(' ') >= 0) {
+                        //     this.scoreString = "请不要输入空格";
+                        //     return;
+                        // } else if (this.password.length == 0) {
+                        //     this.scoreString = "请输入密码";
+                        //     return;
+                        // } else if (this.password.indexOf('{') >= 0 || this.password.indexOf('}') >= 0) {
+                        //     this.scoreString = "请不要输入大括号";
+                        //     return;
+                        // } else if (this.username.indexOf('..') >= 0 || this.username.indexOf('..') >= 0) {
+                        //     this.scoreString = "请不要输入..";
+                        //     return;
+                        // }
 
                         // Wait for the first request to finish
                         this.scoreString = "等待数据处理中..."
@@ -240,6 +230,19 @@
                             return;
                         }
 
+                        const req1 = {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json"
+                            },
+                            body: JSON.stringify({
+                                name: this.username,
+                                pass: this.password,
+                                timestamp: data1.timestamp,
+                                sid: this.semesterID,
+                                type: 1
+                            })
+                        };
 
                         //response2 = await fetch(url2);
                         data2 = await fetch(url, req1).then(response => response.json());

@@ -20,17 +20,20 @@ import aiohttp
 from hashlib import md5
 from math import ceil, floor
 
+ll = []
 
-with open(sys.argv[1], 'rb') as f:
-    try:  # catch OSError in case of a one line file 
-        f.seek(-2, os.SEEK_END)
-        while f.read(1) != b'\n':
-            f.seek(-2, os.SEEK_CUR)
-    except OSError:
-        f.seek(0)
-    ll = f.readline().decode()
-ll = ll.rsplit(' ', 1)
-usc = ll[0].rsplit(' ', 1)
+file_obj = open(sys.argv[1], 'r')
+
+try:
+    for i in range(3):
+        _temp = file_obj.readline()
+        while('\n' in _temp):
+            _temp = _temp[:-1]
+        ll.append(_temp)
+except:
+    print("inregular file")
+finally:
+    file_obj.close()
 
 def semesterId_to_time(sid):
     is_first = ((sid%2)==1)
@@ -58,11 +61,11 @@ Jdict = dict()
 Jdict["rstatus"] = True
 Jdict["err"] = False
 
-stmp, enc = enc(usc[1])
+stmp, enc = enc(ll[1])
 
 # Payload when submitting the login request
 payload = {
-    "name": usc[0],
+    "name": ll[0],
     "password": enc,
     "timestamp": stmp,
     "isWeekPassword": 0,
@@ -241,6 +244,8 @@ async def main(sid):
         for i in range(count):
             task = asyncio.create_task(get(session,get_grade_list_url('null',i+1,sid)))
             task_list.append(task)
+        if len(task_list) == 0:
+            return
         done, pending = await asyncio.wait(task_list, timeout=None)
         task_ids = []
         for i in done:
@@ -297,11 +302,12 @@ async def main(sid):
             stri = '%.1f'%gpa
             if dis:
                 Jdict[subject_names[i]] = stri
+    session.close()
 
 print(Jdict)
 
 loop = asyncio.get_event_loop()
-loop.run_until_complete(main(int(ll[1])))
+loop.run_until_complete(main(int(ll[2])))
 
 json_object = json.dumps(Jdict, indent = 4) 
 
