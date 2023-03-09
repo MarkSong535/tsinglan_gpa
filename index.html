@@ -9,7 +9,7 @@
     <script src="https://cdn.staticfile.org/vue/2.2.2/vue.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
     <meta charset="utf-8">
-    <title>Where's UR GPA?</title>
+    <title>还我GPA</title>
 </head>
 
 
@@ -25,6 +25,7 @@
                     <i class="mdui-icon material-icons">info</i>
                     <span class="mdui-typo-title">Where's UR GPA?</span>
                     <div class="mdui-toolbar-spacer"></div>
+                    <a href="/zh/spec/">百分比模式</a>
                     <a href="/en/">English Version</a>
                 </div>
             </div>
@@ -47,7 +48,7 @@
             <div class="mdui-card-primary">
                 <div class="mdui-card-primary-title">欢迎！</div>
 
-                <div class="mdui-card-primary-subtitle">请输入您的账号与密码</div>
+                <div class="mdui-card-primary-subtitle">请输入您的校宝账号与密码</div>
             </div>
             <div class="mdui-card-content">
                 <div class="mdui-textfield">
@@ -189,6 +190,13 @@
                         })
                     };
                     try {
+                        if (this.username.length == 0) {
+                            this.scoreString = "请输入用户名";
+                            return;
+                        } else if (this.password.length == 0) {
+                            this.scoreString = "请输入密码";
+                            return;
+                        }
                         // Check if the username is valid
                         // if (this.username.indexOf(' ') >= 0) {
                         //     this.scoreString = "请不要输入空格";

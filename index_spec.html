@@ -1,0 +1,296 @@
+<!--Author: Bruno Chen and Mark Song, File name: index.html, Last Updated: 2023/2/19, Version 4.0-->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<html>
+<link rel="apple-touch-icon" href="/tsinglan.png">
+
+<head>
+    <!-- MDUI CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/mdui@1.0.1/dist/css/mdui.min.css" integrity="sha384-cLRrMq39HOZdvE0j6yBojO4+1PrHfB7a9l5qLcmRm/fiWXYY+CndJPmyu5FV/9Tw" crossorigin="anonymous" />
+    <script src="https://cdn.staticfile.org/vue/2.2.2/vue.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+    <meta charset="utf-8">
+    <title>还我GPA - 百分比</title>
+</head>
+
+
+
+<body class="mdui-typo mdui-theme-primary-indigo" style="padding-top: 60px;">
+    <div id="app" class="main">
+
+
+        <header>
+            <!--Header-->
+            <div class="mdui-appbar-fixed mdui-appbar">
+                <div class="mdui-toolbar mdui-color-theme mdui-shadow-2">
+                    <i class="mdui-icon material-icons">info</i>
+                    <span class="mdui-typo-title">Where's UR GPA?</span>
+                    <div class="mdui-toolbar-spacer"></div>
+                    <a href="/zh/">正常版</a>
+                    <a href="/en/spec/">English Version</a>
+                </div>
+            </div>
+        </header>
+
+        <!--
+            <div class="mdui-card mdui-container" style="margin-top: 55px;" ><--info->
+                <div class="mdui-card-primary">
+                    <div class="mdui-card-primary-title">欢迎</div>
+                    <div class="mdui-card-primary-subtitle">使用方法</div>
+                </div>
+                <div class="mdui-card-content">
+                    欢迎使用 <b>Where's UR GPA?</b>，这是一个用于查询成绩的小工具，目前仍在开发中，可能会有一些问题，如果您发现了问题，请联系我们，我们会尽快修复。
+                </div>
+            </div>
+            -->
+
+        <div class="mdui-card mdui-container" style="margin-top: 50px;">
+            <!--input card-->
+            <div class="mdui-card-primary">
+                <div class="mdui-card-primary-title">欢迎！</div>
+
+                <div class="mdui-card-primary-subtitle">请输入您的校宝账号与密码</div>
+            </div>
+            <div class="mdui-card-content">
+                <div class="mdui-textfield">
+                    <!--Input Textfield-->
+                    <input class="mdui-textfield-input" v-model="username" type="text" placeholder="username" />
+                    </br>
+                    <input class="mdui-textfield-input" v-model="password" type="password" placeholder="password" />
+                </div>
+
+                <div class="mdui-devider"></div>
+            </div>
+            <div class="mdui-card-actions" style="padding-left: 20px;">
+                <h4>选择获取的学期</h4>
+                <div class="mdui-card-primary-subtitle">查询后，请稍等一会，不要多次点击</div>
+            </div>
+            <div class="mdui-card-content mdui-container">
+                <!--Choosing Semester-->
+                <form>
+                    <!--Form-->
+                    <div class="mdui-row">
+                        <label class="mdui-radio">
+                            <input type="radio" name="group1" v-model="semesterID" value="0" />
+                            <i class="mdui-radio-icon"></i>
+                            当前学期
+                        </label>
+                    </div>
+                    <div class="mdui-row">
+                        <label class="mdui-radio">
+                            <input type="radio" name="group1" v-model="semesterID" value="21208" />
+                            <i class="mdui-radio-icon"></i>
+                            2022-2023学年第二学期
+                        </label>
+                    </div>
+                    <div class="mdui-row">
+                        <label class="mdui-radio">
+                            <input type="radio" name="group1" v-model="semesterID" value="21207" />
+                            <i class="mdui-radio-icon"></i>
+                            2022-2023学年第一学期
+                        </label>
+                    </div>
+                    <div class="mdui-row">
+                        <label class="mdui-radio">
+                            <input type="radio" name="group1" v-model="semesterID" value="21206" />
+                            <i class="mdui-radio-icon"></i>
+                            2021-2022学年第二学期
+                        </label>
+                    </div>
+                    <div class="mdui-row">
+                        <label class="mdui-radio">
+                            <input type="radio" name="group1" v-model="semesterID" value="21205" />
+                            <i class="mdui-radio-icon"></i>
+                            2021-2022学年第一学期
+                        </label>
+                    </div>
+
+                </form>
+            </div>
+            <div class="mdui-card-actions" style="margin-bottom: 20px; padding-left: 20px;">
+                <!--Fetch Button-->
+
+                <button class="mdui-btn mdui-btn-raised mdui-ripple mdui-color-theme" v-if="scoreString != '等待数据处理中...'" @click="fetchData(username,semesterID)">查询</button>
+            </div>
+
+            <div class="mdui-progress" v-if="scoreString == '等待数据处理中...'">
+                <div class="mdui-progress-indeterminate"></div>
+            </div>
+        </div>
+
+
+        <div class="mdui-card mdui-container" style="margin-top: 50px; margin-bottom: 50px;">
+            <div class="mdui-card-primary">
+                <div class="mdui-card-primary-title">输出</div>
+                <div class="mdui-card-primary-subtitle">查看您的成绩</div>
+                <div class="mdui-card-content" v-if="scoreString === ''">
+                    <div class="mdui-textfield" style="margin-bottom: 20px;">
+                        <h3>
+                            <center>暂无结果</center>
+                        </h3>
+                    </div>
+                </div>
+                <div class="mdui-card-content" v-else>
+                    <div class="mdui-textfield">
+                        <textarea class="mdui-textfield-input" rows=20 placeholder="">{{this.scoreString}}</textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <footer class="page-footer mdui-color-theme mdui-shadow-2">
+        <div class="container">
+            <div class="row">
+                <div class="col l6 s12">
+                    <h5 class="white-text">说明</h5>
+                    <p class="grey-text text-lighten-4">本网站尚未经过大量测试，较<b>不稳定</b> 如有疑问请联系我们</br>登陆信息与gpa均不在本服务器上记录</br><a href="/terms.html">用户协议与信息安全信息</a></p>
+                </div>
+                <div class="col l4 offset-l2 s12">
+                    <h5 class="white-text">更多</h5>
+                    <ul>
+                        <li><a class="grey-text text-lighten-3" href="https://github.com/MarkSong535/tsinglan_gpa">仓库地址</a></li>
+                        <li><a class="grey-text text-lighten-3" href="https://marksong.tech/works/tls/tls_gpa/">项目地址</a></li>
+                        <li><a class="grey-text text-lighten-3" href="mailto:admin@tsinglan.live">联系管理员</a></li>
+                </div>
+            </div>
+        </div>
+        <div class="footer-copyright">
+            <div class="container">
+                Copyright (C) 2023 Tsinglan IT Advanced Lab</br>
+                <a href="https://github.com/MarkSong535/tsinglan_gpa/blob/main/LICENSE">Under GNU Affero General Public License v3.0</a>
+            </div>
+        </div>
+    </footer>
+
+
+    <script>
+        new Vue({
+            el: '#app',
+            data: {
+                semesterID: 0,
+                username: '',
+                scoreString: '',
+                password: ''
+            },
+            methods: {
+                async fetchData() {
+                    const url = 'https://tsinglan.live/fet/'
+                    const req0 = {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify({
+                            name: this.username,
+                            pass: this.password,
+                            timestamp: 0,
+                            spec: 0,
+                            sid: this.semesterID,
+                            type: 0
+                        })
+                    };
+                    try {
+                        if (this.username.length == 0) {
+                            this.scoreString = "请输入用户名";
+                            return;
+                        } else if (this.password.length == 0) {
+                            this.scoreString = "请输入密码";
+                            return;
+                        }
+                        // Check if the username is valid
+                        // if (this.username.indexOf(' ') >= 0) {
+                        //     this.scoreString = "请不要输入空格";
+                        //     return;
+                        // } else if (this.username.length == 0) {
+                        //     this.scoreString = "请输入用户名";
+                        //     return;
+                        // } else if (this.username.indexOf('{') >= 0 || this.username.indexOf('}') >= 0) {
+                        //     this.scoreString = "请不要输入大括号";
+                        //     return;
+                        // } else if (this.username.indexOf('..') >= 0 || this.username.indexOf('..') >= 0) {
+                        //     this.scoreString = "请不要输入..";
+                        //     return;
+                        // }
+
+                        // if (this.password.indexOf(' ') >= 0) {
+                        //     this.scoreString = "请不要输入空格";
+                        //     return;
+                        // } else if (this.password.length == 0) {
+                        //     this.scoreString = "请输入密码";
+                        //     return;
+                        // } else if (this.password.indexOf('{') >= 0 || this.password.indexOf('}') >= 0) {
+                        //     this.scoreString = "请不要输入大括号";
+                        //     return;
+                        // } else if (this.username.indexOf('..') >= 0 || this.username.indexOf('..') >= 0) {
+                        //     this.scoreString = "请不要输入..";
+                        //     return;
+                        // }
+
+                        // Wait for the first request to finish
+                        this.scoreString = "等待数据处理中..."
+                        const response1 = await fetch(url, req0);
+                        const data1 = await response1.json();
+                        // Check the status returned by the first request
+
+                        if (!data1.rstatus) {
+                            console.error("Error: " + data1.message);
+                            this.scoreString = "出错了，请重试或联系我们 \n Error:" + data1.message;
+                            return;
+                        }
+
+                        const req1 = {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json"
+                            },
+                            body: JSON.stringify({
+                                name: this.username,
+                                pass: this.password,
+                                timestamp: data1.timestamp,
+                                sid: this.semesterID,
+                                type: 1
+                            })
+                        };
+
+                        //response2 = await fetch(url2);
+                        data2 = await fetch(url, req1).then(response => response.json());
+
+                        await new Promise(resolve => setTimeout(resolve, 1000));
+
+                        // Wait for the second request to finish
+                        while (data2.rstatus === false) {
+                            response2 = await fetch(url, req1);
+                            data2 = await response2.json();
+                            if (data2.rstatus === true) {
+                                break;
+                            }
+                            await new Promise(resolve => setTimeout(resolve, 500));
+
+                        }
+
+                        if (data2.status == false) {
+                            this.scoreString = "登陆失败"
+                        } else {
+                            //Clean up the data
+                            delete data2.err;
+                            delete data2.status;
+                            delete data2.rstatus;
+
+                            this.scoreString = JSON.stringify(data2, null, 4);
+                        }
+                        console.log(data2);
+                    } catch (error) {
+                        console.error(error);
+                        this.scoreString = "出错了，请重试或联系我们1 \n Error:" + error;
+                    }
+                }
+            }
+
+        })
+    </script>
+</body>
+
+</html>
+
+<!-- Path: index.html -->

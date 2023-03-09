@@ -1,0 +1,5 @@
+start_ip,end_ip,country,country_name,continent,continent_name
+1:1::,1:1::ffff:ffff:ffff:ffff,BO,Bolivia,SA,South America
+66:113::,66:113::ffff:ffff:ffff:ffff,RU,Russia,EU,Europe
+fd::,fd::ffff:ffff:ffff:ffff,KW,Kuwait,AS,Asia
+1.0.0.0,1.0.0.0,AU,Australia,OC,Oceania

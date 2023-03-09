@@ -2,9 +2,9 @@
 # -*- encoding: utf-8 -*-
 '''
 @File       :   score4.py
-@Time       :   2023/02/20 22:23:00
+@Time       :   2023/03/05 19:14:00
 @Author     :   Mark Song
-@Version    :   4.0
+@Version    :   5.0
 @Contact:   :   marksong0730@gmail.com
 '''
 
@@ -179,7 +179,7 @@ def is_contains_chinese(strs):
 
 def percentage_to_weight(per,state):
     score = 0
-    if (per>=97 and per<=100):
+    if (per>=97):
         score = 4.3
     elif (per>=93 and per<97):
         score = 4.0
@@ -209,6 +209,36 @@ def percentage_to_weight(per,state):
         score += 1
         if score == 1:
             score = 0
+    return score
+
+def percentage_to_mark(per):
+    score = ''
+    if (per>=97 and per<=100):
+        score = 'A+'
+    elif (per>=93 and per<97):
+        score = 'A'
+    elif (per>=90 and per<93):
+        score = 'A-'
+    elif (per>=87 and per<90):
+        score = 'B+'
+    elif (per>=83 and per<87):
+        score = 'B'
+    elif (per>=80 and per<83):
+        score = 'B-'
+    elif (per>=77 and per<80):
+        score = 'C+'
+    elif (per>=73 and per<77):
+        score = 'C'
+    elif (per>=70 and per<73):
+        score = 'C-'
+    elif (per>=67 and per<70):
+        score = 'D+'
+    elif (per>=63 and per<67):
+        score = 'D'
+    elif (per>=60 and per<63):
+        score = 'D-'
+    else:
+        score = 'Failed'
     return score
 
 tasks_info = []
@@ -289,19 +319,23 @@ async def main(sid):
                 tasks_by_subject[subject_ids.index(tasks_info[i][0])].append(tasks_info[i])
         tasks_info = tasks_by_subject
         len_ = len(tasks_by_subject)
+        total_grade = 0
         for i in range(len_):
             dis = True
             gpa = get_gpa(tasks_by_subject[i])
+            gpa_ = gpa
             if("AP" in subject_names[i]) or ("A Level" in subject_names[i]) or ("Linear Algebra" in subject_names[i]) or ("AS" in subject_names[i]):
                 gpa = percentage_to_weight(gpa,True)
             elif ("Physical Education" in subject_names[i]) or (is_contains_chinese(subject_names[i])) or ("PE" in subject_names[i]):
                 dis = False
-                gpa *= 100
             else:
                 gpa = percentage_to_weight(gpa,False)
             stri = '%.1f'%gpa
+            stri += " "+percentage_to_mark(gpa_)
+            total_grade += gpa
             if dis:
                 Jdict[subject_names[i]] = stri
+        Jdict["Total GPA"] = '%.1f'%(total_grade/len_)
     session.close()
 
 print(Jdict)

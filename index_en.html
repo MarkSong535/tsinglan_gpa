@@ -25,6 +25,7 @@
                     <i class="mdui-icon material-icons">info</i>
                     <span class="mdui-typo-title">Where's UR GPA?</span>
                     <div class="mdui-toolbar-spacer"></div>
+                    <a href="/en/spec/">Percentage Mode</a>
                     <a href="/zh/">中文版</a>
                 </div>
             </div>
@@ -47,7 +48,7 @@
             <div class="mdui-card-primary">
                 <div class="mdui-card-primary-title">Welcome!</div>
 
-                <div class="mdui-card-primary-subtitle">Please enter your password</div>
+                <div class="mdui-card-primary-subtitle">Please enter your schoolis username and password</div>
             </div>
             <div class="mdui-card-content">
                 <div class="mdui-textfield">
@@ -188,6 +189,13 @@
                         })
                     };
                     try {
+                        if (this.username.length == 0) {
+                            this.scoreString = "Please enter your username";
+                            return;
+                        } else if (this.password.length == 0) {
+                            this.scoreString = "Please enter your password";
+                            return;
+                        }
                         // Check if the username is valid
                         // if (this.username.indexOf(' ') >= 0) {
                         //     this.scoreString = "Do not input space";
