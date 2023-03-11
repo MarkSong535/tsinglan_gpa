@@ -6,5 +6,6 @@
     "normal_user_daily_limit": 0,
     "onhold_user_daily_limit": 0,
     "onhold_threshold": 0,
-    "hostname": ""
+    "hostname": "",
+    "port": 0
 }

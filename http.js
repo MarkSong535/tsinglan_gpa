@@ -14,6 +14,7 @@ const config_data = JSON.parse(fs.readFileSync("config.json",'utf8'))
 const db_file = config_data["database"];
 const hostname = config_data["hostname"];
 const ipinfo_key = config_data["ipinfo_key"];
+const port = config_data["port"];
 const sqlite3 = require('sqlite3');
 var http = require('http');
 var url = require('url');
@@ -295,4 +296,4 @@ http.createServer(function(req, res) {
         });
         return res.end("404 Not Found @ " + access);
     }
-}).listen(3100);
+}).listen(port);
