@@ -1,14 +1,12 @@
 #!/usr/bin/env python
 # -*- encoding: utf-8 -*-
 '''
-@File       :   score7.py
-@Time       :   2023/03/05 19:14:00
+@File       :   score.py
+@Time       :   2023/03/11
 @Author     :   Mark Song
-@Version    :   6.0_specific
+@Version    :   7.0
 @Contact:   :   marksong0730@gmail.com
 '''
-
-# If you want to use the present semester, then just replace semesterid with 0
 
 import requests
 import asyncio
@@ -31,7 +29,6 @@ hold_user_max_access_per_day = config.get("onhold_user_daily_limit")
 onhold_threshold = config.get("onhold_threshold")
 u_access = 0
 
-print(config.get("normal_user_daily_limit"))
 
 path_to_db = config.get("database")
 
@@ -48,16 +45,6 @@ u_id = db.fetchall()[0][0]
 code_exec = """SELECT PERMIT_TYPE FROM USER WHERE ID="""+str(u_id)
 db.execute(code_exec)
 user_permit = db.fetchall()[0][0]
-print(user_permit)
-# if velocity > 20:
-#     code_exec = """UPDATE SESSION SET RETURN_DATA='{"rstatus":true,"error":"You have exceeded the number of request you can make today"}' WHERE S_ID="""+str(session_id)
-#     db.execute(code_exec)
-#     conn.commit()
-#     code_exec = """UPDATE SESSION SET STATUS=1 WHERE S_ID="""+str(session_id)
-#     db.execute(code_exec)
-#     conn.commit()
-#     conn.close()
-# else:
 do_run = False
 if mode == "whitelist":
     if (user_permit == 1) or (user_permit == 9):
@@ -97,7 +84,6 @@ if do_run:
         db.execute(code_exec)
         count = db.fetchall()[0][0] + 1
         code_exec = """UPDATE USER SET SESSION_COUNT="""+str(count)+""" WHERE ID="""+str(uid)
-        print(code_exec)
         db.execute(code_exec)
         conn.commit()
 
@@ -426,17 +412,10 @@ if do_run:
         session.close()
         append_entry(db_info[3])
 
-    #print(Jdict)
-    #print(db_info)
-
     loop = asyncio.get_event_loop()
     loop.run_until_complete(main(int(db_info[5])))
 
     json_object = json.dumps(Jdict, indent = 4) 
-
-    #print(json_object)
-
-    #print(str(json_object))
 
     code_exec = """UPDATE SESSION SET RETURN_DATA='"""+str(json_object)+"""' WHERE S_ID="""+str(session_id)
     db.execute(code_exec)
@@ -445,11 +424,7 @@ if do_run:
     db.execute(code_exec)
     conn.commit()
     db.execute("""SELECT * FROM SESSION WHERE S_ID="""+str(session_id))
-    #print(db.fetchall())
     conn.close()
-    #print(code_exec)
-
-    print("done")
 else:
     code_exec = """UPDATE SESSION SET RETURN_DATA='{"rstatus":true,"error_en":"You
      have exceeded the number of request you can make today.You can only make
@@ -459,7 +434,6 @@ else:
        """+str(u_access)+"""次请求。"""+("""您的账户由于访问过于频繁，本网站已限制您的每日使用次数，
        请联系管理员以解除该限制。""" if user_permit == 2 else "")+""""}' WHERE S_ID="""+str(session_id)
     code_exec = code_exec.replace('\n', '').replace('    ', '').replace('   ', '').replace('  ', '')
-    print(code_exec)
     db.execute(code_exec)
     conn.commit()
     code_exec = """UPDATE SESSION SET STATUS=1 WHERE S_ID="""+str(session_id)

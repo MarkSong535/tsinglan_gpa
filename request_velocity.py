@@ -1,3 +1,13 @@
+#!/usr/bin/env python
+# -*- encoding: utf-8 -*-
+'''
+@File       :   request_velocity.py
+@Time       :   2023/03/11
+@Author     :   Mark Song
+@Version    :   7.0
+@Contact:   :   marksong0730@gmail.com
+'''
+
 from os.path import exists
 import sqlite3 as sql
 import sys

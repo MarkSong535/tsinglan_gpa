@@ -1,3 +1,12 @@
+#!/usr/bin/env python
+# -*- encoding: utf-8 -*-
+'''
+@File       :   config.py
+@Time       :   2023/03/11
+@Author     :   Mark Song
+@Version    :   7.0
+@Contact:   :   marksong0730@gmail.com
+'''
 import json
 import os
 
