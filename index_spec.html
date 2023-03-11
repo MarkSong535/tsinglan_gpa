@@ -184,7 +184,7 @@
                         body: JSON.stringify({
                             name: this.username,
                             pass: this.password,
-                            timestamp: 0,
+                            session_id: 0,
                             spec: 0,
                             sid: this.semesterID,
                             type: 0
@@ -247,7 +247,7 @@
                             body: JSON.stringify({
                                 name: this.username,
                                 pass: this.password,
-                                timestamp: data1.timestamp,
+                                session_id: data1.session_id,
                                 sid: this.semesterID,
                                 type: 1
                             })
@@ -274,6 +274,7 @@
                         } else {
                             //Clean up the data
                             delete data2.err;
+                            delete data2.error_en;
                             delete data2.status;
                             delete data2.rstatus;
 
