@@ -1,7 +1,8 @@
 from os.path import exists
 import sqlite3 as sql
+import config
 
-path_to_db = "/Users/marksong/Project/tsinglan_gpa/database/db_test1.db"
+path_to_db = config.get("database")
 
 n_db_exist = False if exists(path_to_db) else True
 

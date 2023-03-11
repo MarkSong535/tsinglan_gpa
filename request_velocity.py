@@ -2,9 +2,10 @@ from os.path import exists
 import sqlite3 as sql
 import sys
 import time
+import config
 
 def velocity(session_id):
-    path_to_db = "/Users/marksong/Project/tsinglan_gpa/database/db_test1.db"
+    path_to_db = config.get("database")
     conn = sql.connect(path_to_db)
     db = conn.cursor()
     _time = int(time.time()*1000)

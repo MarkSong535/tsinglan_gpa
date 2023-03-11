@@ -25,7 +25,6 @@
                     <i class="mdui-icon material-icons">info</i>
                     <span class="mdui-typo-title">Where's UR GPA?</span>
                     <div class="mdui-toolbar-spacer"></div>
-                    <a href="/en/spec/">Percentage Mode</a>
                     <a href="/zh/">中文版</a>
                 </div>
             </div>
@@ -104,11 +103,16 @@
                     </div>
 
                 </form>
+                <label class="mdui-switch">
+                    <input type="checkbox" v-model="percentage" />
+                    <i class="mdui-switch-icon"></i>
+                    &#160;&#160;&#160;&#160;Percentage Mode
+                </label>
             </div>
             <div class="mdui-card-actions" style="margin-bottom: 20px; padding-left: 20px;">
                 <!--Fetch Button-->
 
-                <button class="mdui-btn mdui-btn-raised mdui-ripple mdui-color-theme" v-if="scoreString != 'Processing...'" @click="fetchData(username,semesterID)">Fetch</button>
+                <button class="mdui-btn mdui-btn-raised mdui-ripple mdui-color-theme" v-if="scoreString != 'Processing...'" @click="fetchData(username,semesterID,percentage)">Fetch</button>
 
             </div>
             <div class="mdui-progress" v-if="scoreString == 'Processing...'">
@@ -121,6 +125,17 @@
             <div class="mdui-card-primary">
                 <div class="mdui-card-primary-title">Return</div>
                 <div class="mdui-card-primary-subtitle">View Your Grades</div>
+                <div class="mdui-table-fluid" id="score_table">
+                    <table class="mdui-table mdui-table-hoverable">
+                      <thead>
+                        <tr>
+                          <th>Subject</th>
+                          <th>Score(numerical)</th>
+                          <th>Score(alphabetical)</th>
+                        </tr>
+                      </thead>
+                    </table>
+                </div>
                 <div class="mdui-card-content" v-if="scoreString === ''">
                     <div class="mdui-textfield" style="margin-bottom: 20px;">
                         <h3>
@@ -130,7 +145,7 @@
                 </div>
                 <div class="mdui-card-content" v-else>
                     <div class="mdui-textfield">
-                        <textarea class="mdui-textfield-input" rows=20 placeholder="">{{this.scoreString}}</textarea>
+                        <textarea class="mdui-textfield-input" rows=3 placeholder="">{{this.scoreString}}</textarea>
                     </div>
                 </div>
             </div>
@@ -170,7 +185,8 @@
                 semesterID: 0,
                 username: '',
                 scoreString: '',
-                password: ''
+                password: '',
+                percentage: false
             },
             methods: {
                 async fetchData() {
@@ -185,6 +201,7 @@
                             pass: this.password,
                             session_id: 0,
                             sid: this.semesterID,
+                            percentage: this.percentage,
                             type: 0
                         })
                     };
@@ -246,6 +263,7 @@
                                 name: this.username,
                                 pass: this.password,
                                 session_id: data1.session_id,
+                                percentage: true,
                                 sid: this.semesterID,
                                 type: 1
                             })
@@ -269,14 +287,23 @@
 
                         if (data2.status == false) {
                             this.scoreString = "Login Failed"
+                        } else if (data2["error_en"]!=undefined){
+                            this.scoreString = data2['error_en'];
+                            text = "<table class=\"mdui-table mdui-table-hoverable\"><thead><tr><th>Subject</th><th>Score(numerical)</th><th>Score(alphabetical)</th></tr></thead><tbody></tbody></table>"
+                            document.getElementById("score_table").innerHTML = text;
                         } else {
                             //Clean up the data
                             delete data2.err;
                             delete data2.error_zh;
                             delete data2.status;
                             delete data2.rstatus;
-
-                            this.scoreString = JSON.stringify(data2, null, 4);
+                            text = "<table class=\"mdui-table mdui-table-hoverable\"><thead><tr><th>Subject</th><th>Score(numerical)</th><th>Score(alphabetical)</th></tr></thead><tbody>"
+                            for (x in data2){
+                                text += "<tr><td>"+x+"</td><td>" + data2[x].split(' ')[0] + "</td><td>" + data2[x].split(' ')[1] + "</td></tr>";
+                            }
+                            text += "</tbody></table>"   
+                            document.getElementById("score_table").innerHTML = text;
+                            this.scoreString = "Fetched";
                         }
                         console.log(data2);
                     } catch (error) {

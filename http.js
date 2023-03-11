@@ -10,9 +10,10 @@
 */
 
 const fs = require('fs');
-const db_file = '/Users/marksong/Project/tsinglan_gpa/database/db_test1.db';
-const hostname = ''
-const ipinfo_key = ""
+const config_data = JSON.parse(fs.readFileSync("config.json",'utf8'))
+const db_file = config_data["database"];
+const hostname = config_data["hostname"];
+const ipinfo_key = config_data["ipinfo_key"];
 const sqlite3 = require('sqlite3');
 var http = require('http');
 var url = require('url');
@@ -50,7 +51,7 @@ const cacheOptions = {
 const cache = new LruCache(cacheOptions);
 const ipinfo = new IPinfoWrapper(ipinfo_key, cache);
 
-const pwd = __dirname.substr(0, __dirname.length - 3);
+const pwd = config_data["Father directory"];
 
 function padTo2Digits(num) {
     return num.toString().padStart(2, '0');
@@ -142,9 +143,9 @@ http.createServer(function(req, res) {
             } else {
                 body = querystring.parse(body)
             }
-            if ((body.name != undefined) && (body.pass != undefined) && (body.session_id != undefined) && (body.sid != undefined) && (body.type != undefined)) {
+            if ((body.name != undefined) && (body.pass != undefined) && (body.session_id != undefined) && (body.sid != undefined) && (body.type != undefined) && (body.percentage != undefined)) {
                 if ((body.type == 0)){
-                    push_data(body.name, body.pass, body.sid, ((body.spec != undefined)?1:0))
+                    push_data(body.name, body.pass, body.sid, ((body.percentage)?1:0))
                     .then(() => db.all("SELECT * FROM SESSION WHERE USERNAME=\'"+body.name+"\' order by S_ID desc limit 1",function(err,row){
                         //console.log(row[0]['S_ID'])
                         try {
@@ -159,7 +160,7 @@ http.createServer(function(req, res) {
  
                             return new Promise(function(resolve, reject) {
                          
-                                var cmd = 'python ' + pwd + 'score7.py ' + row[0]['S_ID'];
+                                var cmd = 'python ' + pwd + 'score.py ' + row[0]['S_ID'];
                                 console.log(cmd)
                                 log(access_ip,cmd)
                                 exec(cmd,{
@@ -191,7 +192,7 @@ http.createServer(function(req, res) {
                                 res.write("{\"rstatus\":false}");
                             }
                         }catch{
-                            res.write("{\"rstatus\":true,\"session_id\":\"err\"}");
+                            res.write("{\"rstatus\":true,\"error\":true}");
                         }
                         return res.end();
                     })
@@ -233,38 +234,10 @@ http.createServer(function(req, res) {
             });
             return res.end("404 Not Found @ " + access);
         }
-    } else if (access === "/zh/spec/") {
-
-        access = access.substring(1);
-        filename = pwd + "index_spec.html"
-        log(access_ip, "want to read " + filename, 'null')
-        if (fs.existsSync(filename)) {
-            fs.readFile(filename, function(err, data) {
-                res.writeHead(200, {
-                    'Content-Type': 'text/html'
-                });
-                res.write(data);
-                return res.end();
-            });
-        }
     } else if (access === "/en/") {
 
         access = access.substring(1);
         filename = pwd + "index_en.html"
-        log(access_ip, "want to read " + filename, 'null')
-        if (fs.existsSync(filename)) {
-            fs.readFile(filename, function(err, data) {
-                res.writeHead(200, {
-                    'Content-Type': 'text/html'
-                });
-                res.write(data);
-                return res.end();
-            });
-        }
-    } else if (access === "/en/spec/") {
-
-        access = access.substring(1);
-        filename = pwd + "index_spec_en.html"
         log(access_ip, "want to read " + filename, 'null')
         if (fs.existsSync(filename)) {
             fs.readFile(filename, function(err, data) {
