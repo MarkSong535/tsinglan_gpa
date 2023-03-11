@@ -2,15 +2,7 @@ test.py
 /transactions/
 *.json
 /node_modules/
-/html_assests/*
 test.js
 /py_db/
 /database/
 /__*
-*.bk
-*.csv
-*.mmdb
-main.js
-/pro/main.js
-pro/main.js
-*/main.js
