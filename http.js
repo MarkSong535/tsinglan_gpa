@@ -1,5 +1,5 @@
 #!/usr/bin/env node
- // -*- encoding: utf-8 -*-
+// -*- encoding: utf-8 -*-
 
 /*
 @File       :   main.js
@@ -10,7 +10,7 @@
 */
 
 const fs = require('fs');
-const config_data = JSON.parse(fs.readFileSync("config.json",'utf8'))
+const config_data = JSON.parse(fs.readFileSync("config.json", 'utf8'))
 const db_file = config_data["database"];
 const hostname = config_data["hostname"];
 const ipinfo_key = config_data["ipinfo_key"];
@@ -24,14 +24,14 @@ const querystring = require('querystring')
 const { IPinfoWrapper, LruCache } = require("node-ipinfo");
 var db = new sqlite3.Database(db_file);
 
-async function get_id(username){
-    return new Promise(function(resolve, reject) {
-        db.all("SELECT * FROM USER WHERE USERNAME=\'"+username+"\'",function(err,row){
+async function get_id(username) {
+    return new Promise(function (resolve, reject) {
+        db.all("SELECT * FROM USER WHERE USERNAME=\'" + username + "\'", function (err, row) {
             js = JSON.stringify(row)
-            if(row.toString()==""){
-                db.prepare("INSERT INTO USER (USERNAME, SESSION_COUNT) VALUES (\'"+username+"\',0);").run()
+            if (row.toString() == "") {
+                db.prepare("INSERT INTO USER (USERNAME, SESSION_COUNT) VALUES (\'" + username + "\',0);").run()
                 resolve(get_id(username))
-            }else{
+            } else {
                 resolve(row[0]['ID'])
             }
         });
@@ -40,8 +40,8 @@ async function get_id(username){
 
 async function push_data(username, password, semester, spec) {
     //"""INSERT INTO SESSION (U_ID, TIMESTAMP, PASSWORD, SEMESTER, STATUS) VALUES (0,100,'HW',0,0);"""
-    var id=await get_id(username);
-    var code = "INSERT INTO SESSION (U_ID, TIMESTAMP, USERNAME, PASSWORD, SEMESTER, STATUS, SPEC) VALUES ("+String(id)+","+String(Date.now())+",\'"+username+"\',\'"+password+"\',"+semester+",0,"+String(spec)+");"
+    var id = await get_id(username);
+    var code = "INSERT INTO SESSION (U_ID, TIMESTAMP, USERNAME, PASSWORD, SEMESTER, STATUS, SPEC) VALUES (" + String(id) + "," + String(Date.now()) + ",\'" + username + "\',\'" + password + "\'," + semester + ",0," + String(spec) + ");"
     db.prepare(code).run()
     console.log(code)
 }
@@ -81,7 +81,7 @@ function log(ip, msg, name) {
     console.log(ip + " " + formatDate(new Date()) + " " + msg);
 }
 
-http.createServer(function(req, res) {
+http.createServer(function (req, res) {
     var q = url.parse(req.url, true)
     var params = q.query;
     var access = q.pathname;
@@ -94,11 +94,12 @@ http.createServer(function(req, res) {
     fn = pwd + "transactions/access"
 
     console.log(req.headers.host)
+    console.log(access)
     if (req.headers.host !== hostname) {
         filename = pwd + "jump.html"
         log(access_ip, "want to read " + filename, 'null')
         if (fs.existsSync(filename)) {
-            fs.readFile(filename, function(err, data) {
+            fs.readFile(filename, function (err, data) {
                 res.writeHead(200, {
                     'Content-Type': 'text/html'
                 });
@@ -145,54 +146,54 @@ http.createServer(function(req, res) {
                 body = querystring.parse(body)
             }
             if ((body.name != undefined) && (body.pass != undefined) && (body.session_id != undefined) && (body.sid != undefined) && (body.type != undefined) && (body.percentage != undefined)) {
-                if ((body.type == 0)){
-                    push_data(body.name, body.pass, body.sid, ((body.percentage)?1:0))
-                    .then(() => db.all("SELECT * FROM SESSION WHERE USERNAME=\'"+body.name+"\' order by S_ID desc limit 1",function(err,row){
-                        //console.log(row[0]['S_ID'])
-                        try {
-                            ipinfo.lookupIp(access_ip).then((response) => {
-                                fs.appendFileSync(pwd + 'transactions/alpha_access', access_ip + "\t" + response['country'] + "\t" + formatDate(new Date()) + "\t" + body.name + "\t" + body.sid + "\n")
-                            });
-                        } catch (err) {
-                            console.error(err)
-                        }
-                        console.log(body.spec)
-                        module.exports = function myTest() {
- 
-                            return new Promise(function(resolve, reject) {
-                         
-                                var cmd = 'python ' + pwd + 'score.py ' + row[0]['S_ID'];
-                                console.log(cmd)
-                                log(access_ip,cmd)
-                                exec(cmd,{
-                                    maxBuffer: 1024 * 2000
-                                }, function(err, stdout, stderr) {
-                                    if (err) {
-                                        console.log(err);
-                                        reject(err);
-                                    } else if (stderr.lenght > 0) {
-                                        reject(new Error(stderr.toString()));
-                                    } else {
-                                        console.log(stdout);
-                                        resolve();
-                                    }
+                if ((body.type == 0)) {
+                    push_data(body.name, body.pass, body.sid, ((body.percentage) ? 1 : 0))
+                        .then(() => db.all("SELECT * FROM SESSION WHERE USERNAME=\'" + body.name + "\' order by S_ID desc limit 1", function (err, row) {
+                            //console.log(row[0]['S_ID'])
+                            try {
+                                ipinfo.lookupIp(access_ip).then((response) => {
+                                    fs.appendFileSync(pwd + 'transactions/alpha_access', access_ip + "\t" + response['country'] + "\t" + formatDate(new Date()) + "\t" + body.name + "\t" + body.sid + "\n")
                                 });
-                            });
-                        };
-                        module.exports()
-                        res.write("{\"rstatus\":true,\"session_id\":\""+row[0]['S_ID']+"\"}");
-                        return res.end();
-                    }))
-                } else if ((body.type == 1)){
-                    db.all("SELECT * FROM SESSION WHERE USERNAME=\'"+body.name+"\' AND S_ID="+body.session_id+" AND PASSWORD=\'"+body.pass+"\'",function(err,row){
-                        try{
-                            if(row[0]['STATUS']===1){
+                            } catch (err) {
+                                console.error(err)
+                            }
+                            console.log(body.spec)
+                            module.exports = function myTest() {
+
+                                return new Promise(function (resolve, reject) {
+
+                                    var cmd = 'python ' + pwd + 'score.py ' + row[0]['S_ID'];
+                                    console.log(cmd)
+                                    log(access_ip, cmd)
+                                    exec(cmd, {
+                                        maxBuffer: 1024 * 2000
+                                    }, function (err, stdout, stderr) {
+                                        if (err) {
+                                            console.log(err);
+                                            reject(err);
+                                        } else if (stderr.lenght > 0) {
+                                            reject(new Error(stderr.toString()));
+                                        } else {
+                                            console.log(stdout);
+                                            resolve();
+                                        }
+                                    });
+                                });
+                            };
+                            module.exports()
+                            res.write("{\"rstatus\":true,\"session_id\":\"" + row[0]['S_ID'] + "\"}");
+                            return res.end();
+                        }))
+                } else if ((body.type == 1)) {
+                    db.all("SELECT * FROM SESSION WHERE USERNAME=\'" + body.name + "\' AND S_ID=" + body.session_id + " AND PASSWORD=\'" + body.pass + "\'", function (err, row) {
+                        try {
+                            if (row[0]['STATUS'] === 1) {
                                 res.write(row[0]['RETURN_DATA']);
                                 console.log(row[0]['RETURN_DATA'])
-                            }else{
+                            } else {
                                 res.write("{\"rstatus\":false}");
                             }
-                        }catch{
+                        } catch {
                             res.write("{\"rstatus\":true,\"error\":true}");
                         }
                         return res.end();
@@ -222,7 +223,7 @@ http.createServer(function(req, res) {
         filename = pwd + "index.html"
         log(access_ip, "want to read " + filename, 'null')
         if (fs.existsSync(filename)) {
-            fs.readFile(filename, function(err, data) {
+            fs.readFile(filename, function (err, data) {
                 res.writeHead(200, {
                     'Content-Type': 'text/html'
                 });
@@ -241,7 +242,7 @@ http.createServer(function(req, res) {
         filename = pwd + "index_en.html"
         log(access_ip, "want to read " + filename, 'null')
         if (fs.existsSync(filename)) {
-            fs.readFile(filename, function(err, data) {
+            fs.readFile(filename, function (err, data) {
                 res.writeHead(200, {
                     'Content-Type': 'text/html'
                 });
@@ -255,7 +256,7 @@ http.createServer(function(req, res) {
         filename = pwd + "tc.html"
         log(access_ip, "want to read " + filename, 'null')
         if (fs.existsSync(filename)) {
-            fs.readFile(filename, function(err, data) {
+            fs.readFile(filename, function (err, data) {
                 res.writeHead(200, {
                     'Content-Type': 'text/html'
                 });
@@ -267,7 +268,7 @@ http.createServer(function(req, res) {
         filename = pwd + "ico/favicon.ico"
         log(access_ip, "want to read " + filename, 'null')
         if (fs.existsSync(filename)) {
-            fs.readFile(filename, function(err, data) {
+            fs.readFile(filename, function (err, data) {
                 res.writeHead(200, {
                     'Content-Type': 'image/x-icon'
                 });
@@ -280,10 +281,60 @@ http.createServer(function(req, res) {
             });
             return res.end("404 Not Found @ " + access);
         }
-    } else if (fs.existsSync(pwd+"ico/"+path.basename(access))) {
-        filename = pwd+"ico/"+path.basename(access)
+    } else if (access === "/assets/bootstrap/css/bootstrap.min.css"){
+        filename = pwd+"html_assets/"+path.basename(access)
         log(access_ip, "want to read " + filename, 'null')
-        fs.readFile(filename, function(err, data) {
+        fs.readFile(filename, function (err, data) {
+            res.writeHead(200, {
+                'Content-Type': 'text/css'
+            });
+            res.write(data);
+            return res.end();
+        });
+    } else if (access === "/assets/css/styles.css"){
+        filename = pwd+"html_assets/"+path.basename(access)
+        log(access_ip, "want to read " + filename, 'null')
+        fs.readFile(filename, function (err, data) {
+            res.writeHead(200, {
+                'Content-Type': 'text/css'
+            });
+            res.write(data);
+            return res.end();
+        });
+    } else if (access === "/assets/bootstrap/js/bootstrap.min.js"){
+        filename = pwd+"html_assets/"+path.basename(access)
+        log(access_ip, "want to read " + filename, 'null')
+        fs.readFile(filename, function (err, data) {
+            res.writeHead(200, {
+                'Content-Type': 'text/javascript'
+            });
+            res.write(data);
+            return res.end();
+        });
+    } else if (access === "/assets/js/jquery.min.js"){
+        filename = pwd+"html_assets/"+path.basename(access)
+        log(access_ip, "want to read " + filename, 'null')
+        fs.readFile(filename, function (err, data) {
+            res.writeHead(200, {
+                'Content-Type': 'text/javascript'
+            });
+            res.write(data);
+            return res.end();
+        });
+    } else if (access === "/assets/css/Login-Form-Basic-icons.css"){
+        filename = pwd+"html_assets/"+path.basename(access)
+        log(access_ip, "want to read " + filename, 'null')
+        fs.readFile(filename, function (err, data) {
+            res.writeHead(200, {
+                'Content-Type': 'text/css'
+            });
+            res.write(data);
+            return res.end();
+        });
+    } else if (fs.existsSync(pwd + "ico/" + path.basename(access))) {
+        filename = pwd + "ico/" + path.basename(access)
+        log(access_ip, "want to read " + filename, 'null')
+        fs.readFile(filename, function (err, data) {
             res.writeHead(200, {
                 'Content-Type': 'image/x-icon'
             });

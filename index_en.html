@@ -1,182 +1,137 @@
-<!--Author: Bruno Chen and Mark Song, File name: index_en.html, Last Updated: 2023/3/11, Version 7.0-->
+<!DOCTYPE html>
 <meta name="apple-mobile-web-app-capable" content="yes">
 <html>
 <link rel="apple-touch-icon" href="/tsinglan.png">
-
 <head>
-    <!-- MDUI CSS -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/mdui@1.0.1/dist/css/mdui.min.css" integrity="sha384-cLRrMq39HOZdvE0j6yBojO4+1PrHfB7a9l5qLcmRm/fiWXYY+CndJPmyu5FV/9Tw" crossorigin="anonymous" />
-    <script src="https://cdn.staticfile.org/vue/2.2.2/vue.min.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
     <meta charset="utf-8">
-    <title>Where's UR GPA?</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+    <script src="https://cdn.staticfile.org/vue/2.2.2/vue.min.js"></script>
+    <title>Where is your GPA?</title>
+    <link rel="stylesheet" href="/assets/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/assets/css/Login-Form-Basic-icons.css">
 </head>
 
+<style>
+    @media (prefers-color-scheme: dark) {
+        body, div, table, th, td {
+            color: #eee;
+            background: #121212;
+        }
+    }
 
+    @media (prefers-color-scheme: light) {
+        body, div, table, th, td {
+            color: #121212;
+            background: #eee;
+        }
+    }
+</style>
 
-<body class="mdui-typo mdui-theme-primary-indigo" style="padding-top: 60px;">
+<body>
     <div id="app" class="main">
-
-
-        <header>
-            <!--Header-->
-            <div class="mdui-appbar-fixed mdui-appbar">
-                <div class="mdui-toolbar mdui-color-theme mdui-shadow-2">
-                    <i class="mdui-icon material-icons">info</i>
-                    <span class="mdui-typo-title">Where's UR GPA?</span>
-                    <div class="mdui-toolbar-spacer"></div>
-                    <a href="/zh/">中文版</a>
+        <header class="p-sm-5 p-4">
+            <div class="row justify-content-center">
+                <div class="col-auto text-center text-sm-left align-self-center mt-3 mt-sm-0">
+                    <h1 style="text-align: center;">Tsinglan GPA Fetcher</h1>
+                    <p class="lead" style="text-align: center;">Regain the control of your GPA</p>
+                    <a href="/zh/"><p style="text-align: center;">中文版</p></a>
                 </div>
             </div>
         </header>
-
-        <!--
-            <div class="mdui-card mdui-container" style="margin-top: 55px;" ><--info->
-                <div class="mdui-card-primary">
-                    <div class="mdui-card-primary-title">欢迎</div>
-                    <div class="mdui-card-primary-subtitle">使用方法</div>
+        <div class="container rounded shadow-sm main">
+            <div class="card">
+                <div class="card-body text-center d-flex flex-column align-items-center">
+                    <h5>Enter Your Schoolis Account</h5>
+                    <form>
+                        <div class="mb-3"><input class="form-control" v-model="username" type="email" name="username"
+                                placeholder="Schoolis Username">
+                        </div>
+                        <div class="mb-3"><input class="form-control" v-model="password" type="password" name="password"
+                                placeholder="Schoolis Password">
+                        </div>
+                        <select class="form-control">
+                            <option v-model="semesterID" value="0" selected="">Current Semester</option>
+                            <option v-model="semesterID" value="21208">2022-2023 Second Semester</option>
+                            <option v-model="semesterID" value="21207">2022-2023 First Semester</option>
+                        </select>
+                        <lable>
+                            <div class="mb-3">
+                                <div>
+                                    <input type="checkbox" v-model="percentage" style="display: inline-block;" />
+                                    <p style="display: inline-block;">Percentage Mode</p>
+                                </div>
+                            </div>
+                        </lable>
+                        <div class="mb-3"></div><button class="btn btn-primary d-block w-100" type="button"
+                            v-if="scoreString != 'Processing...'" @click="fetchData(username,semesterID,percentage)">Fetch</button>
+                    </form>
                 </div>
-                <div class="mdui-card-content">
-                    欢迎使用 <b>Where's UR GPA?</b>，这是一个用于查询成绩的小工具，目前仍在开发中，可能会有一些问题，如果您发现了问题，请联系我们，我们会尽快修复。
-                </div>
             </div>
-            -->
-
-        <div class="mdui-card mdui-container" style="margin-top: 50px;">
-            <!--input card-->
-            <div class="mdui-card-primary">
-                <div class="mdui-card-primary-title">Welcome!</div>
-
-                <div class="mdui-card-primary-subtitle">Please enter your schoolis username and password</div>
-            </div>
-            <div class="mdui-card-content">
-                <div class="mdui-textfield">
-                    <!--Input Textfield-->
-                    <input class="mdui-textfield-input" v-model="username" type="text" placeholder="username" />
-                    </br>
-                    <input class="mdui-textfield-input" v-model="password" type="password" placeholder="password" />
-                </div>
-
-                <div class="mdui-devider"></div>
-            </div>
-            <div class="mdui-card-actions" style="padding-left: 20px;">
-                <h4>Select Semester</h4>
-            </div>
-            <div class="mdui-card-content mdui-container">
-                <!--Choosing Semester-->
-                <form>
-                    <!--Form-->
-                    <div class="mdui-row">
-                        <label class="mdui-radio">
-                            <input type="radio" name="group1" v-model="semesterID" value="0" />
-                            <i class="mdui-radio-icon"></i>
-                            Present Semester
-                        </label>
-                    </div>
-                    <div class="mdui-row">
-                        <label class="mdui-radio">
-                            <input type="radio" name="group1" v-model="semesterID" value="21208" />
-                            <i class="mdui-radio-icon"></i>
-                            2022-2023 Second Semester
-                        </label>
-                    </div>
-                    <div class="mdui-row">
-                        <label class="mdui-radio">
-                            <input type="radio" name="group1" v-model="semesterID" value="21207" />
-                            <i class="mdui-radio-icon"></i>
-                            2022-2023 First Semester
-                        </label>
-                    </div>
-                    <div class="mdui-row">
-                        <label class="mdui-radio">
-                            <input type="radio" name="group1" v-model="semesterID" value="21206" />
-                            <i class="mdui-radio-icon"></i>
-                            2021-2022 Second Semester
-                        </label>
-                    </div>
-                    <div class="mdui-row">
-                        <label class="mdui-radio">
-                            <input type="radio" name="group1" v-model="semesterID" value="21205" />
-                            <i class="mdui-radio-icon"></i>
-                            2021-2022 First Semester
-                        </label>
-                    </div>
-
-                </form>
-                <label class="mdui-switch">
-                    <input type="checkbox" v-model="percentage" />
-                    <i class="mdui-switch-icon"></i>
-                    &#160;&#160;&#160;&#160;Percentage Mode
-                </label>
-            </div>
-            <div class="mdui-card-actions" style="margin-bottom: 20px; padding-left: 20px;">
-                <!--Fetch Button-->
-
-                <button class="mdui-btn mdui-btn-raised mdui-ripple mdui-color-theme" v-if="scoreString != 'Processing...'" @click="fetchData(username,semesterID,percentage)">Fetch</button>
-
-            </div>
-            <div class="mdui-progress" v-if="scoreString == 'Processing...'">
-                <div class="mdui-progress-indeterminate"></div>
-            </div>
-        </div>
-
-
-        <div class="mdui-card mdui-container" style="margin-top: 50px; margin-bottom: 50px;">
-            <div class="mdui-card-primary">
-                <div class="mdui-card-primary-title">Return</div>
-                <div class="mdui-card-primary-subtitle">View Your Grades</div>
-                <div class="mdui-table-fluid" id="score_table">
-                    <table class="mdui-table mdui-table-hoverable">
-                      <thead>
+            <h4 class="text-center">Result</h4>
+            <div class="table-responsive" id="score_table">
+                <table class="table">
+                    <thead>
                         <tr>
-                          <th>Subject</th>
-                          <th>Score(numerical)</th>
-                          <th>Score(alphabetical)</th>
+                            <th>Subject</th>
+                            <th>Score(#)</th>
+                            <th>Level</th>
                         </tr>
-                      </thead>
-                    </table>
-                </div>
-                <div class="mdui-card-content" v-if="scoreString === ''">
-                    <div class="mdui-textfield" style="margin-bottom: 20px;">
-                        <h3>
-                            <center>No Result</center>
-                        </h3>
+                    </thead>
+                </table>
+            </div>
+            <p>{{this.scoreString}}</p>
+            <p class="lead"></p>
+        </div>
+        <footer>
+            <div class="container py-4 py-lg-5">
+                <div class="row justify-content-center">
+                    <div class="col-sm-4 col-md-3 text-center text-lg-left d-flex flex-column">
+                        <h3 class="font-weight-bold" style="font-size: 1rem;">About</h3>
+                        <p style="color: rgb(108,117,125);">This site is not stable, if there is any issues with the
+                            site,
+                            please report to site admin.</p>
+                    </div>
+                    <div class="col-sm-4 col-md-3 text-center text-lg-left d-flex flex-column">
+                        <h3 class="font-weight-bold" style="font-size: 1rem;">Legal</h3><a href="/terms.html">
+                            <p style="color: rgb(108,117,125);">Terms, Conditions, Information Safety Information, and
+                                EULA.
+                            </p>
+                        </a><a href="https://github.com/MarkSong535/tsinglan_gpa/blob/main/LICENSE">
+                            <p style="color: rgb(108,117,125);">Code License</p>
+                        </a>
+                    </div>
+                    <div class="col-sm-4 col-md-3 text-center text-lg-left d-flex flex-column">
+                        <h3 class="font-weight-bold" style="font-size: 1rem;">Links</h3>
+                        <ul class="list-unstyled">
+                            <li><a class="text-muted" href="https://github.com/MarkSong535/tsinglan_gpa">Repo Site</a>
+                            </li>
+                            <li><a class="text-muted" href="https://marksong.tech/works/tls/tls_gpa/">Project Site</a>
+                            </li>
+                            <li><a class="text-muted" href="mailto:admin@tsinglan.live">Contact Admin</a></li>
+                        </ul>
                     </div>
                 </div>
-                <div class="mdui-card-content" v-else>
-                    <div class="mdui-textfield">
-                        <textarea class="mdui-textfield-input" rows=3 placeholder="">{{this.scoreString}}</textarea>
-                    </div>
+                <hr>
+                <div class="d-flex justify-content-between pt-3" style="background: var(--bs-gray-100);">
+                    <p class="text-muted mb-0">Copyright © 2023 Tsinglan IT Advanced Lab</p>
+                    <ul class="list-inline text-muted mb-0">
+                        <li class="list-inline-item"><a href="mailto:admin@tsinglan.live"><svg
+                                    xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor"
+                                    viewBox="0 0 16 16" class="bi bi-mailbox">
+                                    <path
+                                        d="M4 4a3 3 0 0 0-3 3v6h6V7a3 3 0 0 0-3-3zm0-1h8a4 4 0 0 1 4 4v6a1 1 0 0 1-1 1H1a1 1 0 0 1-1-1V7a4 4 0 0 1 4-4zm2.646 1A3.99 3.99 0 0 1 8 7v6h7V7a3 3 0 0 0-3-3H6.646z">
+                                    </path>
+                                    <path
+                                        d="M11.793 8.5H9v-1h5a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.354-.146l-.853-.854zM5 7c0 .552-.448 0-1 0s-1 .552-1 0a1 1 0 0 1 2 0z">
+                                    </path>
+                                </svg></a></li>
+                    </ul>
                 </div>
             </div>
-        </div>
+        </footer>
     </div>
-
-
-    <footer class="page-footer mdui-color-theme mdui-shadow-2">
-        <div class="container">
-            <div class="row">
-                <div class="col l6 s12">
-                    <h5 class="white-text">About</h5>
-                    <p class="grey-text text-lighten-4">This site is <b>not stable</b>, if there are any issues or questions please contact us.</br>Your login credential and GPA information are not stored on this site.</br><a href="/terms.html">Terms, Conditions, Information Safety Information, and EULA</a></p>
-                </div>
-                <div class="col l4 offset-l2 s12">
-                    <h5 class="white-text">More</h5>
-                    <ul>
-                        <li><a class="grey-text text-lighten-3" href="https://github.com/MarkSong535/tsinglan_gpa">Repo site (outdated)</a></li>
-                        <li><a class="grey-text text-lighten-3" href="https://marksong.tech/works/tls/tls_gpa/">Project site</a></li>
-                        <li><a class="grey-text text-lighten-3" href="mailto:admin@tsinglan.live">Contact admin</a></li>
-                </div>
-            </div>
-        </div>
-        <div class="footer-copyright">
-            <div class="container">
-                Copyright (C) 2023 Tsinglan IT Advanced Lab</br>
-                <a href="https://github.com/MarkSong535/tsinglan_gpa/blob/main/LICENSE">Under GNU Affero General Public License v3.0</a>
-            </div>
-        </div>
-    </footer>
-
+    <script src="/assets/js/jquery.min.js"></script>
+    <script src="/assets/bootstrap/js/bootstrap.min.js"></script>
 
     <script>
         new Vue({
@@ -184,7 +139,7 @@
             data: {
                 semesterID: 0,
                 username: '',
-                scoreString: '',
+                scoreString: 'Waiting for request...',
                 password: '',
                 percentage: false
             },
@@ -213,47 +168,16 @@
                             this.scoreString = "Please enter your password";
                             return;
                         }
-                        // Check if the username is valid
-                        // if (this.username.indexOf(' ') >= 0) {
-                        //     this.scoreString = "Do not input space";
-                        //     return;
-                        // } else if (this.username.length == 0) {
-                        //     this.scoreString = "Please enter your username";
-                        //     return;
-                        // } else if (this.username.indexOf('{') >= 0 || this.username.indexOf('}') >= 0) {
-                        //     this.scoreString = "Do not input bracket";
-                        //     return;
-                        // } else if (this.username.indexOf('..') >= 0 || this.username.indexOf('..') >= 0) {
-                        //     this.scoreString = "Do not input ..";
-                        //     return;
-                        // }
-
-                        // if (this.password.indexOf(' ') >= 0) {
-                        //     this.scoreString = "Do not input space";
-                        //     return;
-                        // } else if (this.password.length == 0) {
-                        //     this.scoreString = "Please enter your password";
-                        //     return;
-                        // } else if (this.password.indexOf('{') >= 0 || this.password.indexOf('}') >= 0) {
-                        //     this.scoreString = "Do not input bracket";
-                        //     return;
-                        // } else if (this.username.indexOf('..') >= 0 || this.username.indexOf('..') >= 0) {
-                        //     this.scoreString = "Do not input ..";
-                        //     return;
-                        // }
-
                         // Wait for the first request to finish
                         this.scoreString = "Processing..."
                         const response1 = await fetch(url, req0);
                         const data1 = await response1.json();
                         // Check the status returned by the first request
-
                         if (!data1.rstatus) {
                             console.error("Error: " + data1.message);
-                            this.scoreString = "Error, please try again or contact us \n Error:" + data1.message;
+                            this.scoreString = "Error:" + data1.message;
                             return;
                         }
-
                         const req1 = {
                             method: "POST",
                             headers: {
@@ -263,17 +187,14 @@
                                 name: this.username,
                                 pass: this.password,
                                 session_id: data1.session_id,
-                                percentage: true,
                                 sid: this.semesterID,
+                                percentage: true,
                                 type: 1
                             })
                         };
-
                         //response2 = await fetch(url2);
                         data2 = await fetch(url, req1).then(response => response.json());
-
                         await new Promise(resolve => setTimeout(resolve, 1000));
-
                         // Wait for the second request to finish
                         while (data2.rstatus === false) {
                             response2 = await fetch(url, req1);
@@ -282,14 +203,14 @@
                                 break;
                             }
                             await new Promise(resolve => setTimeout(resolve, 500));
-
                         }
-
+                        console.log(data2)
                         if (data2.status == false) {
                             this.scoreString = "Login Failed"
-                        } else if (data2["error_en"]!=undefined){
+                        } else if (data2["error_en"] != undefined) {
                             this.scoreString = data2['error_en'];
-                            text = "<table class=\"mdui-table mdui-table-hoverable\"><thead><tr><th>Subject</th><th>Score(numerical)</th><th>Score(alphabetical)</th></tr></thead><tbody></tbody></table>"
+                            text =
+                                "<table class=\"table\"><thead><tr><th>Subject</th><th>Score(#)</th><th>Level</th></tr></thead><tbody></tbody></table>"
                             document.getElementById("score_table").innerHTML = text;
                         } else {
                             //Clean up the data
@@ -297,26 +218,25 @@
                             delete data2.error_zh;
                             delete data2.status;
                             delete data2.rstatus;
-                            text = "<table class=\"mdui-table mdui-table-hoverable\"><thead><tr><th>Subject</th><th>Score(numerical)</th><th>Score(alphabetical)</th></tr></thead><tbody>"
-                            for (x in data2){
-                                text += "<tr><td>"+x+"</td><td>" + data2[x].split(' ')[0] + "</td><td>" + data2[x].split(' ')[1] + "</td></tr>";
+                            text =
+                                "<table class=\"table\"><thead><tr><th>Subject</th><th>Score(#)</th><th>Level</th></tr></thead><tbody>"
+                            for (x in data2) {
+                                text += "<tr><td>" + x + "</td><td>" + data2[x].split(' ')[0] +
+                                    "</td><td>" + data2[x].split(' ')[1] + "</td></tr>";
                             }
-                            text += "</tbody></table>"   
+                            text += "</tbody></table>"
                             document.getElementById("score_table").innerHTML = text;
-                            this.scoreString = "Fetched";
+                            this.scoreString = "Success!";
                         }
                         console.log(data2);
                     } catch (error) {
                         console.error(error);
-                        this.scoreString = "Error, please try again or contact us1 \n Error:" + error;
+                        this.scoreString = "Error:" + error;
                     }
                 }
             }
-
         })
     </script>
 </body>
 
 </html>
-
-<!-- Path: index.html -->

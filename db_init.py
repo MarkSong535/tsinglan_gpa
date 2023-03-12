@@ -24,7 +24,9 @@ if n_db_exist:
             ID INTEGER PRIMARY KEY, 
             USERNAME TEXT NOT NULL, 
             SESSION_COUNT INT NOT NULL, 
-            PERMIT_TYPE INT DEFAULT 0);"""
+            PERMIT_TYPE INT DEFAULT 0,
+            CNAME TEXT,
+            ENAME TEXT);"""
     )
     db.execute(
         """CREATE TABLE SESSION (
@@ -38,6 +40,16 @@ if n_db_exist:
             SPEC INT NOT NULL,
             RETURN_DATA TEXT,
             TIMEOUT BOOLEAN DEFAULT false);"""
+    )    
+    db.execute(
+        """CREATE TABLE SUBJECT (
+            SUB_ID INTEGER PRIMARY KEY,
+            SUB_KEY TEXT NOT NULL,
+            ENG_NAME_LIST TEXT NOT NULL,
+            ZHN_NAME_LIST TEXT,
+            ENG_NAME TEXT NOT NULL,
+            ZHN_NAME TEXT,
+            MAX_SCORE REAL NOT NULL);"""
     )
     conn.commit()
     conn.close()

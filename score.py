@@ -78,11 +78,11 @@ if do_run:
         else:
             return data[0][0]
 
-    def append_entry(username: str):
+    def append_entry(username: str, count: int=1):
         uid = user_data_id(find_user(username, "USER"))
         code_exec = """SELECT SESSION_COUNT FROM USER WHERE ID="""+str(uid)+""";"""
         db.execute(code_exec)
-        count = db.fetchall()[0][0] + 1
+        count = db.fetchall()[0][0] + count
         code_exec = """UPDATE USER SET SESSION_COUNT="""+str(count)+""" WHERE ID="""+str(uid)
         db.execute(code_exec)
         conn.commit()
@@ -313,12 +313,44 @@ if do_run:
     async def get(session, url):
         async with session.get(url) as resp:
             return await resp.json()
-
+    
     @asyncio.coroutine
     def fetch(session, url):
         with aiohttp.Timeout(10):
             resp = yield from session.get(url)
             return (yield from resp.text())
+    
+    async def append_subject(session,sid):
+        cname = (await get(session, "/api/MemberShip/GetCurrentStudentInfo"))['data']['cName']
+        ename = (await get(session, "/api/MemberShip/GetCurrentStudentInfo"))['data']['eName']
+        code_exec = """UPDATE USER SET CNAME='"""+cname+"""' WHERE ID="""+str(u_id)
+        db.execute(code_exec)
+        conn.commit()
+        code_exec = """UPDATE USER SET ENAME='"""+ename+"""' WHERE ID="""+str(u_id)
+        db.execute(code_exec)
+        conn.commit()
+        resp = await get(session, "/api/LearningTask/GetStuSubjectListForSelect?semesterId="+str(sid))
+        #resp = await resp.text()
+        for i in resp['data']:
+            db.execute("""SELECT * FROM SUBJECT WHERE SUB_KEY='"""+i['subjectCode']+'\'')
+            data = db.fetchall()
+            if(len(data)==0):
+                s_name = i['name']
+                weight = ''
+                if("AP" in s_name) or ("A Level" in s_name) or ("Linear Algebra" in s_name) or ("AS" in s_name):
+                    weight = '5.3'
+                elif ("Physical Education" in s_name) or (is_contains_chinese(s_name)) or ("PE" in s_name):
+                    weight = '0.0'
+                else:
+                    weight = '4.3'
+                db.execute("""INSERT INTO SUBJECT (SUB_KEY,ENG_NAME_LIST,ENG_NAME,MAX_SCORE) VALUES('"""+i['subjectCode']+"""','"""+i['name']+"""','"""+i['name']+"""',"""+weight+""")""")
+            else:
+                pre_list = data[0][2]
+                pre_list_split = pre_list.split(',')
+                if (not i['name'] in pre_list_split):
+                    pre_list += ','+i['name']
+                db.execute("""UPDATE SUBJECT SET ENG_NAME_LIST='"""+pre_list+"""' WHERE SUB_KEY='"""+i['subjectCode']+'\'')
+                conn.commit()
 
     async def main(sid):
         session = aiohttp.ClientSession('https://tsinglanstudent.schoolis.cn/')
@@ -347,6 +379,7 @@ if do_run:
                 if(ret['data']['list'][0]['finishState'] == 1):
                     task_ids.append(i.result()['data']['list'][0]['id'])
             task_list = []
+            await append_subject(session,sid)
             for i in task_ids:
                 task = asyncio.create_task(get(session,get_task_info(i)))
                 task_list.append(task)
@@ -385,37 +418,56 @@ if do_run:
                     tasks_by_subject[subject_ids.index(tasks_info[i][0])].append(tasks_info[i])
             tasks_info = tasks_by_subject
             len_ = len(tasks_by_subject)
+            __len = len_
             total_grade = 0
             for i in range(len_):
                 dis = True
                 gpa = get_gpa(tasks_by_subject[i])
-                gpa_ = gpa
-                if("AP" in subject_names[i]) or ("A Level" in subject_names[i]) or ("Linear Algebra" in subject_names[i]) or ("AS" in subject_names[i]):
-                    gpa = percentage_to_weight(gpa,True)
-                elif ("Physical Education" in subject_names[i]) or (is_contains_chinese(subject_names[i])) or ("PE" in subject_names[i]):
-                    dis = False
-                else:
-                    gpa = percentage_to_weight(gpa,False)
+                db.execute("""SELECT * FROM SUBJECT WHERE ENG_NAME_LIST LIKE '%"""+subject_names[i]+"""%'""")
                 if db_info[7] == 1:
-                    stri = '%.1f'%gpa_
-                    stri += " "+percentage_to_mark(gpa_)
-                    total_grade += gpa_
-                    if dis:
-                        Jdict[subject_names[i]] = stri
-                else:
                     stri = '%.1f'%gpa
-                    stri += " "+percentage_to_mark(gpa_)
-                    total_grade += gpa
+                    stri += " "+percentage_to_mark(gpa)
+                    __temp_ = db.fetchall()[0][6]
+                    if __temp_ != 0:
+                        total_grade += gpa
+                    else:
+                        __len -= 1
+                    Jdict[subject_names[i]] = stri
+                else:
+                    __temp_ = db.fetchall()[0][6]
+                    __temp = percentage_to_weight(float('%.1f'%gpa),(__temp_==5.3))
+                    if __temp_ == 0:
+                        __temp = 0
+                        __len -= 1
+                    stri = '%.1f'%__temp
+                    stri += " "+percentage_to_mark(gpa)
                     if dis:
-                        Jdict[subject_names[i]] = stri
-            Jdict["Total GPA"] = '%.1f'%(total_grade/len_)+' na'
-        session.close()
-        append_entry(db_info[3])
+                        total_grade += __temp
+                    Jdict[subject_names[i]] = stri
+            if db_info[7] == 1:
+                Jdict["Total GPA"] = '%.1f'%(total_grade/__len)+' N/A'
+            else:
+                Jdict["Total GPA"] = '%.2f'%(total_grade/__len)+' N/A'
+        await session.close()
+        
 
     loop = asyncio.get_event_loop()
     loop.run_until_complete(main(int(db_info[5])))
-
+    if(len(Jdict.keys())==2):
+        Jdict["err"] = True
+        Jdict["error_en"] = "None Schoolis Entry Found"
+        Jdict["error_zh"] = "未查找到任何校宝成绩"
     json_object = json.dumps(Jdict, indent = 4) 
+
+    if not Jdict["err"]:
+        append_entry(db_info[3])
+
+    try:
+        i = sys.argv[2]
+        append_entry(db_info[3],int(sys.argv[2]))
+        print(json_object)
+    except:
+        print()
 
     code_exec = """UPDATE SESSION SET RETURN_DATA='"""+str(json_object)+"""' WHERE S_ID="""+str(session_id)
     db.execute(code_exec)
