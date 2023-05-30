@@ -22,13 +22,16 @@ import sqlite3 as sql
 from typing import List
 import request_velocity
 import config
+from datetime import datetime
 
 mode = config.get("mode")
 normal_user_max_access_per_day = config.get("normal_user_daily_limit")
 hold_user_max_access_per_day = config.get("onhold_user_daily_limit")
 onhold_threshold = config.get("onhold_threshold")
 u_access = 0
-
+req_hostname = 'https://tsinglanstudent.schoolis.cn'
+#req_hostname = 'https://gy.tsinglan.live'
+#req_hostname = 'http://localhost:3390'
 
 path_to_db = config.get("database")
 
@@ -36,6 +39,8 @@ conn = sql.connect(path_to_db)
 
 
 db = conn.cursor()
+
+semester_index_translated = []
 
 session_id = sys.argv[1]
 velocity = request_velocity.velocity(session_id)
@@ -45,6 +50,9 @@ u_id = db.fetchall()[0][0]
 code_exec = """SELECT PERMIT_TYPE FROM USER WHERE ID="""+str(u_id)
 db.execute(code_exec)
 user_permit = db.fetchall()[0][0]
+code_exec = """SELECT USERNAME FROM USER WHERE ID="""+str(u_id)
+db.execute(code_exec)
+username = db.fetchall()[0][0]
 do_run = False
 if mode == "whitelist":
     if (user_permit == 1) or (user_permit == 9):
@@ -60,6 +68,19 @@ elif mode == "blacklist":
         if velocity <= normal_user_max_access_per_day:
             do_run = True
         u_access = normal_user_max_access_per_day
+elif mode == "limit":
+    from user_count import get_count
+    code_exec = """SELECT TIME FROM PERMIT WHERE USERNAME='"""+username+"\'"
+    db.execute(code_exec)
+    __data = db.fetchall()
+    if(len(__data)==0):
+        do_run = False
+    elif((get_count(username))<(__data[0][0])):
+        do_run = True
+    elif(user_permit == 9):
+        do_run = True
+
+
 if user_permit != 9 and velocity > onhold_threshold:
     code_exec = """UPDATE USER SET PERMIT_TYPE=2 WHERE ID="""+str(uid)
     db.execute(code_exec)
@@ -98,7 +119,7 @@ if do_run:
     db.execute(code_exec)
     conn.commit()
 
-    def semesterId_to_time(sid):
+    def semesterId_to_time_guess(sid):
         is_first = ((sid%2)==1)
         year = sid - 21207
         year /= 2
@@ -114,6 +135,11 @@ if do_run:
             end = str(year+1)+'-08-26'
         return start, end
 
+    def semesterId_to_time(sid):
+        for i in semester_index_translated:
+            if i[0] == sid:
+                return i[5], i[6]
+        return semesterId_to_time_guess(sid)
 
     def enc(pas):
         stmp = int(time.time())
@@ -142,6 +168,7 @@ if do_run:
 
     def get_grade_list_url(sub, page, sid):
         start, end = semesterId_to_time(sid)
+        
         return '/api/LearningTask/GetList?semesterId='+str(sid)+'&subjectId='+sub+'&typeId=null&key=&beginTime='+start+'&endTime='+end+'&pageIndex='+str(page)+'&pageSize=1'
 
     def get_task_info(task_id):
@@ -187,11 +214,17 @@ if do_run:
             for j in range(len_):
                 
                 array[i][j] *= weight[i]/100
-                array[i][j] /= temp
+                if temp!= 0:
+                    array[i][j] /= temp
+                else:
+                    array[i][j] = 0
         temp = sum(weight[:quaters])/100
         for i in range(quaters):
             for j in range(len_):
-                array[i][j] /= temp
+                if temp != 0:
+                    array[i][j] /= temp
+                else:
+                    array[i][j] = 0
         return array
 
     def sum_grade(array, weight):
@@ -307,18 +340,52 @@ if do_run:
     tasks_info = []
 
     async def get_aw(session, url):
-        async with session.get(url) as resp:
+        header = {
+            "Accept" : "*/*",
+            "Content-Type" : "application/json",
+            "Origin" : req_hostname,
+            "Accept-Language" : "en-US,en;q=0.9",
+            "Host" : "tsinglanstudent.schoolis.cn",
+            "User-Agent" : "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.3 Safari/605.1.15",
+            "referer" : req_hostname,
+            "Accept-Encoding" : "gzip, deflate, br",
+            "Connection" : "keep-alive"
+        }
+        async with session.get(url, headers=header) as resp:
             return await resp.text()
 
     async def get(session, url):
-        async with session.get(url) as resp:
+        header = {
+            "Accept" : "*/*",
+            "Content-Type" : "application/json",
+            "Origin" : req_hostname,
+            "Accept-Language" : "en-US,en;q=0.9",
+            "Host" : "tsinglanstudent.schoolis.cn",
+            "User-Agent" : "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.3 Safari/605.1.15",
+            "referer" : req_hostname,
+            "Accept-Encoding" : "gzip, deflate, br",
+            "Connection" : "keep-alive"
+        }
+        async with session.get(url, headers=header) as resp:
             return await resp.json()
     
-    @asyncio.coroutine
-    def fetch(session, url):
-        with aiohttp.Timeout(10):
-            resp = yield from session.get(url)
-            return (yield from resp.text())
+    #@asyncio.coroutine
+    # async def fetch(session, url):
+    #     header = {
+    #         "Accept" : "*/*",
+    #         "Content-Type" : "application/json",
+    #         "Origin" : req_hostname,
+    #         "Accept-Language" : "en-US,en;q=0.9",
+    #         "Host" : "tsinglanstudent.schoolis.cn",
+    #         "User-Agent" : "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.3 Safari/605.1.15",
+    #         "referer" : req_hostname,
+    #         "Accept-Encoding" : "gzip, deflate, br",
+    #         "Connection" : "keep-alive"
+    #     }
+    #     with aiohttp.Timeout(10):
+    #         resp = yield session.get(url, headers=header)
+    #         retur = str(resp.text())
+    #         return retur
     
     async def append_subject(session,sid):
         cname = (await get(session, "/api/MemberShip/GetCurrentStudentInfo"))['data']['cName']
@@ -353,17 +420,59 @@ if do_run:
                 conn.commit()
 
     async def main(sid):
-        session = aiohttp.ClientSession('https://tsinglanstudent.schoolis.cn/')
-        resp1 = await session.post('/api/MemberShip/Login', data=payload)
+        session = aiohttp.ClientSession(req_hostname)
+        header = {
+            "Accept" : "*/*",
+            "Content-Type" : "application/json",
+            "Origin" : req_hostname,
+            "Content-Length" : str(len(json.dumps(payload).replace(' ',''))),
+            "Accept-Language" : "en-US,en;q=0.9",
+            "Host" : "tsinglanstudent.schoolis.cn",
+            "User-Agent" : "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.3 Safari/605.1.15",
+            "referer" : req_hostname,
+            "Accept-Encoding" : "gzip, deflate, br",
+            "Connection" : "keep-alive"
+        }
+        resp1 = await session.post('/api/MemberShip/Login', data=json.dumps(payload).replace(' ',''), headers=header)
+        header = {
+            "Accept" : "*/*",
+            "Content-Type" : "application/json",
+            "Origin" : req_hostname,
+            "Accept-Language" : "en-US,en;q=0.9",
+            "Host" : "tsinglanstudent.schoolis.cn",
+            "User-Agent" : "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.3 Safari/605.1.15",
+            "referer" : req_hostname,
+            "Accept-Encoding" : "gzip, deflate, br",
+            "Connection" : "keep-alive"
+        }
         aget = await get(session,'/api/School/GetSchoolSemesters')
+        semester_index = aget['data']
+        for i in semester_index:
+            s_index = i['startDate'].split('(')[1].split(')')[0].split('+')
+            e_index = i['endDate'].split('(')[1].split(')')[0].split('+')
+            start_time = int(s_index[0])
+            end_time = int(e_index[0])
+            start_time_local = start_time + int(s_index[1])*36000
+            end_time_local = end_time + int(e_index[1])*36000
+            start_time_dt = datetime.fromtimestamp(start_time/1000)
+            end_time_dt = datetime.fromtimestamp(end_time/1000)
+            start_time_dt_format = start_time_dt.strftime('%Y-%m-%d')
+            end_time_dt_format = end_time_dt.strftime('%Y-%m-%d')
+            semester_index_translated.append([i['id'],start_time,end_time,start_time_local,end_time_local,start_time_dt_format,end_time_dt_format])
+        current_time = round((datetime.utcnow() - datetime(1970, 1, 1)).total_seconds()*1000)
+        sid_ = 0
+        for i in semester_index_translated:
+            if(current_time>i[1] and current_time<i[2]):
+                sid_ = i[0]
+                break
         if not "data" in aget:
             Jdict["err"] = True
             Jdict["error_en"] = "Schoolis Login Failed"
             Jdict["error_zh"] = "校宝登录失败"
             return
         if(sid == 0):
-            sid = aget['data'][0]['id']
-        async with session.get(get_grade_list_url('null',1,sid)) as req:
+            sid = sid_
+        async with session.get(get_grade_list_url('null',1,sid), headers=header) as req:
             js = await req.json()
             count = js['data']['totalCount']
             task_list = []
@@ -404,7 +513,12 @@ if do_run:
                     ports = []
                     for j in ret['data']['evaProjects']:
                         ports.append([j['id'],j['proportion']])
+                    if len(ports) < 2:
+                        ports.append([100,100])
+                    if len(ret['data']['evaProjects']) < 2:
+                        ret['data']['evaProjects'].append({'id':100})
                     tasks_info.append([sub,ret['data']['evaProjects'][1]['id'],ret['data']['score'],ret['data']['totalScore'],ports])
+
             tasks_by_subject = []
             for _ in subject_ids:
                 tasks_by_subject.append([])
@@ -492,3 +606,4 @@ else:
     db.execute(code_exec)
     conn.commit()
     conn.close()
+

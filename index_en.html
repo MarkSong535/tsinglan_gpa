@@ -49,10 +49,10 @@
                         <div class="mb-3"><input class="form-control" v-model="password" type="password" name="password"
                                 placeholder="Schoolis Password">
                         </div>
-                        <select class="form-control">
-                            <option v-model="semesterID" value="0" selected="">Current Semester</option>
-                            <option v-model="semesterID" value="21208">2022-2023 Second Semester</option>
-                            <option v-model="semesterID" value="21207">2022-2023 First Semester</option>
+                        <select class="form-control" v-model="semesterID">
+                            <option v-for="option in options" :value="option.value">
+                                {{ option.text }}
+                            </option>
                         </select>
                         <lable>
                             <div class="mb-3">
@@ -141,11 +141,18 @@
                 username: '',
                 scoreString: 'Waiting for request...',
                 password: '',
-                percentage: false
+                percentage: false,
+                options: [
+                            { text: 'Current Semester', value: 0 },
+                            { text: '2023-2024 Second Semester', value: 24700 },
+                            { text: '2023-2024 First Semester', value: 24699 },
+                            { text: '2022-2023 Second Semester', value: 21208 },
+                            { text: '2022-2023 First Semester', value: 21207 }
+                        ]
             },
             methods: {
                 async fetchData() {
-                    const url = 'https://tsinglan.live/fet/'
+                    const url = 'http://localhost:3390/fet/'
                     const req0 = {
                         method: "POST",
                         headers: {

@@ -50,7 +50,6 @@ const cacheOptions = {
     maxAge: 24 * 1000 * 60 * 60,
 };
 const cache = new LruCache(cacheOptions);
-const ipinfo = new IPinfoWrapper(ipinfo_key, cache);
 
 const pwd = config_data["Father directory"];
 
@@ -86,37 +85,15 @@ http.createServer(function (req, res) {
     var params = q.query;
     var access = q.pathname;
     //var access_file = q.
-    var access_ip = req.headers['cf-connecting-ip'];
+    var access_ip = "10.10.10.10";
 
     log(access_ip, "access to " + q.path, 'null');
 
 
     fn = pwd + "transactions/access"
 
-    console.log(req.headers.host)
-    console.log(access)
-    if (req.headers.host !== hostname) {
-        filename = pwd + "jump.html"
-        log(access_ip, "want to read " + filename, 'null')
-        if (fs.existsSync(filename)) {
-            fs.readFile(filename, function (err, data) {
-                res.writeHead(200, {
-                    'Content-Type': 'text/html'
-                });
-                res.write(data);
-                return res.end();
-            });
-        }
-    }
 
-    try {
-        ipinfo.lookupIp(access_ip).then((response) => {
-            fs.appendFileSync(fn, access_ip + "\t" + response['country'] + "\t" + formatDate(new Date()) + '\t' + req.headers['x-forwarded-proto'] + '://' + req.headers.host + q.path + '\n')
-            fs.appendFileSync(fn + "minimal", access_ip + "\t" + response['country'] + "\t" + formatDate(new Date()) + '\t' + access + '\n')
-        });
-    } catch (err) {
-        console.error(err)
-    }
+
 
     if (req.method === 'POST') {
         let body = '';

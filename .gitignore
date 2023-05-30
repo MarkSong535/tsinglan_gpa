@@ -6,3 +6,6 @@ test.js
 /py_db/
 /database/
 /__*
+*.bk
+*.bk2
+temp

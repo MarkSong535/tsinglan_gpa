@@ -49,11 +49,21 @@
                         <div class="mb-3"><input class="form-control" v-model="password" type="password" name="password"
                                 placeholder="Schoolis Password">
                         </div>
-                        <select class="form-control">
-                            <option v-model="semesterID" value="0" selected="">当前学期</option>
-                            <option v-model="semesterID" value="21208">2022-2023 第二学期</option>
-                            <option v-model="semesterID" value="21207">2022-2023 第一学期</option>
+                        <select class="form-control" v-model="semesterID">
+                            <option v-for="option in options" :value="option.value">
+                                {{ option.text }}
+                            </option>
+                            <!--<option v-model="semesterID" id="0" value="0" for="0" selected="">当前学期</option>
+                            <option v-model="semesterID" id="21208" value="21208" for="21208">2022-2023 第二学期</option>
+                            <option v-model="semesterID" id="21207" value="21207" for="21207">2022-2023 第一学期</option>-->
                         </select>
+                        <!--<select v-model="selected">
+                            <option v-for="option in options" :value="option.value">
+                              {{ option.text }}
+                            </option>
+                          </select>
+                          
+                          <div>Selected: {{ selected }}</div>-->
                         <lable>
                             <div class="mb-3">
                                 <div>
@@ -138,11 +148,19 @@
                 username: '',
                 scoreString: '等待获取...',
                 password: '',
-                percentage: false
+                percentage: false,
+                options: [
+                            { text: '当前学期', value: 0 },
+                            { text: '2023-2024 第二学期', value: 24700 },
+                            { text: '2023-2024 第一学期', value: 24699 },
+                            { text: '2022-2023 第二学期', value: 21208 },
+                            { text: '2022-2023 第一学期', value: 21207 }
+                        ]
             },
             methods: {
+
                 async fetchData() {
-                    const url = 'https://tsinglan.live/fet/'
+                    const url = 'http://localhost:3390/fet/'
                     const req0 = {
                         method: "POST",
                         headers: {
@@ -157,6 +175,7 @@
                             type: 0
                         })
                     };
+                    console.log(this.semesterID)
                     try {
                         if (this.username.length == 0) {
                             this.scoreString = "Please enter your username";
