@@ -10,21 +10,11 @@
 
 ### Install prerequisits
 
-`pip install requests`
+`pip install requirements.txt`
 
 ### Run code
 
 `python score.py username semeterid`
-
-`python score2.py /path/to/file` (this will take in file in the given path and output into same file)
-
-  In the file, write `username semesterid`
-
-`python score3.py /path/to/file` (no change in password required)
-
-  In the file, write `username password semesterid`
-
-The output would be a percentage score for each course.
 
 [Detailed Instructions](https://marksong.tech/works/tls/tls_gpa/)
 
