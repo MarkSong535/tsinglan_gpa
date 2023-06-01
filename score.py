@@ -8,11 +8,9 @@
 @Contact:   :   marksong0730@gmail.com
 '''
 
-import requests
 import asyncio
 import json
 import sys
-import os
 import time
 import aiohttp
 from hashlib import md5
@@ -23,6 +21,9 @@ from typing import List
 import request_velocity
 import config
 from datetime import datetime
+
+total_blacklist = ['', 'test', 'admin', '0']
+total_whitelist = []
 
 mode = config.get("mode")
 normal_user_max_access_per_day = config.get("normal_user_daily_limit")
@@ -37,6 +38,19 @@ path_to_db = config.get("database")
 
 conn = sql.connect(path_to_db)
 
+with open(config.get("Father directory")+"total_bl") as f:
+    lines = f.readlines()
+
+for i in range(len(lines)):
+    lines[i] = lines[i].replace("\n", "")
+    total_blacklist.append(lines[i])
+
+with open(config.get("Father directory")+"total_wl") as f:
+    lines = f.readlines()
+
+for i in range(len(lines)):
+    lines[i] = lines[i].replace("\n", "")
+    total_whitelist.append(lines[i])
 
 db = conn.cursor()
 
@@ -54,6 +68,7 @@ code_exec = """SELECT USERNAME FROM USER WHERE ID="""+str(u_id)
 db.execute(code_exec)
 username = db.fetchall()[0][0]
 do_run = False
+is_spam = False
 if mode == "whitelist":
     if (user_permit == 1) or (user_permit == 9):
         do_run = True
@@ -79,7 +94,13 @@ elif mode == "limit":
         do_run = True
     elif(user_permit == 9):
         do_run = True
-
+if username in total_blacklist or len(username) < 5:
+    do_run = False
+    is_spam = True
+    
+if username in total_whitelist:
+    do_run = True
+    is_spam = False
 
 if user_permit != 9 and velocity > onhold_threshold:
     code_exec = """UPDATE USER SET PERMIT_TYPE=2 WHERE ID="""+str(uid)
@@ -368,25 +389,7 @@ if do_run:
         }
         async with session.get(url, headers=header) as resp:
             return await resp.json()
-    
-    #@asyncio.coroutine
-    # async def fetch(session, url):
-    #     header = {
-    #         "Accept" : "*/*",
-    #         "Content-Type" : "application/json",
-    #         "Origin" : req_hostname,
-    #         "Accept-Language" : "en-US,en;q=0.9",
-    #         "Host" : "tsinglanstudent.schoolis.cn",
-    #         "User-Agent" : "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.3 Safari/605.1.15",
-    #         "referer" : req_hostname,
-    #         "Accept-Encoding" : "gzip, deflate, br",
-    #         "Connection" : "keep-alive"
-    #     }
-    #     with aiohttp.Timeout(10):
-    #         resp = yield session.get(url, headers=header)
-    #         retur = str(resp.text())
-    #         return retur
-    
+
     async def append_subject(session,sid):
         cname = (await get(session, "/api/MemberShip/GetCurrentStudentInfo"))['data']['cName']
         ename = (await get(session, "/api/MemberShip/GetCurrentStudentInfo"))['data']['eName']
@@ -446,7 +449,13 @@ if do_run:
             "Connection" : "keep-alive"
         }
         aget = await get(session,'/api/School/GetSchoolSemesters')
+        if not "data" in aget:
+            Jdict["err"] = True
+            Jdict["error_en"] = "Schoolis Login Failed"
+            Jdict["error_zh"] = "校宝登录失败"
+            return
         semester_index = aget['data']
+
         for i in semester_index:
             s_index = i['startDate'].split('(')[1].split(')')[0].split('+')
             e_index = i['endDate'].split('(')[1].split(')')[0].split('+')
@@ -465,11 +474,6 @@ if do_run:
             if(current_time>i[1] and current_time<i[2]):
                 sid_ = i[0]
                 break
-        if not "data" in aget:
-            Jdict["err"] = True
-            Jdict["error_en"] = "Schoolis Login Failed"
-            Jdict["error_zh"] = "校宝登录失败"
-            return
         if(sid == 0):
             sid = sid_
         async with session.get(get_grade_list_url('null',1,sid), headers=header) as req:
@@ -564,9 +568,13 @@ if do_run:
                 Jdict["Total GPA"] = '%.2f'%(total_grade/__len)+' N/A'
         await session.close()
         
-
-    loop = asyncio.get_event_loop()
-    loop.run_until_complete(main(int(db_info[5])))
+    try:
+        loop = asyncio.get_event_loop()
+        loop.run_until_complete(main(int(db_info[5])))
+    except:
+        Jdict["err"] = True
+        Jdict["error_en"] = "Unknown Error"
+        Jdict["error_zh"] = "未知错误"
     if(len(Jdict.keys())==2):
         Jdict["err"] = True
         Jdict["error_en"] = "None Schoolis Entry Found"
@@ -596,9 +604,9 @@ else:
      have exceeded the number of request you can make today.You can only make
      """+str(u_access)+""" request in a 24 hour interval."""+("""Your account is onhold
      due to spam protection, contact website admin to remove your onhold status.""" if
-       user_permit == 2 else "")+"""","error_zh":"您已达到近日访问上限。您每24小时仅能请求
-       """+str(u_access)+"""次请求。"""+("""您的账户由于访问过于频繁，本网站已限制您的每日使用次数，
-       请联系管理员以解除该限制。""" if user_permit == 2 else "")+""""}' WHERE S_ID="""+str(session_id)
+       user_permit == 2 or is_spam else "")+"""","error_zh":"您已达到近日访问上限。您每24小时仅能请求
+       """+str(u_access)+"""次请求。"""+("""您的账户由于访问过于频繁或使用了非法用户名格式，本网站已限制您的每日使用次数，
+       请联系管理员以解除该限制。""" if user_permit == 2 or is_spam else "")+""""}' WHERE S_ID="""+str(session_id)
     code_exec = code_exec.replace('\n', '').replace('    ', '').replace('   ', '').replace('  ', '')
     db.execute(code_exec)
     conn.commit()
