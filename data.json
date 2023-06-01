@@ -1,0 +1,46 @@
+{
+    "en":[
+        {
+            "text": "Current Semester",
+            "value": 0
+        },
+        {
+            "text": "2023-2024 Second Semester",
+            "value": 24700
+        },
+        {
+            "text": "2023-2024 First Semester",
+            "value": 24699
+        },
+        {
+            "text": "2022-2023 Second Semester",
+            "value": 21208
+        },
+        {
+            "text": "2022-2023 First Semester",
+            "value": 21207
+        }
+    ],
+    "zh":[
+        {
+            "text": "当前学期",
+            "value": 0
+        },
+        {
+            "text": "2023-2024 第二学期",
+            "value": 24700
+        },
+        {
+            "text": "2023-2024 第一学期",
+            "value": 24699
+        },
+        {
+            "text": "2022-2023 第二学期",
+            "value": 21208
+        },
+        {
+            "text": "2022-2023 第一学期",
+            "value": 21207
+        }
+    ]
+}

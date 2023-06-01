@@ -227,6 +227,21 @@ http.createServer(function (req, res) {
                 return res.end();
             });
         }
+    } else if (access === "/data.json") {
+
+        access = access.substring(1);
+        filename = pwd + "data.json"
+        log(access_ip, "want to read " + filename, 'null')
+        if (fs.existsSync(filename)) {
+            fs.readFile(filename, function (err, data) {
+                res.writeHead(200, {
+                    'Content-Type': 'text/json',
+                    'charset': 'utf-8'
+                });
+                res.write(data);
+                return res.end();
+            });
+        }
     } else if (access === "/terms.html") {
 
         access = access.substring(1);

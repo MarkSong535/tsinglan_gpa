@@ -149,18 +149,22 @@
                 scoreString: '等待获取...',
                 password: '',
                 percentage: false,
-                options: [
-                            { text: '当前学期', value: 0 },
-                            { text: '2023-2024 第二学期', value: 24700 },
-                            { text: '2023-2024 第一学期', value: 24699 },
-                            { text: '2022-2023 第二学期', value: 21208 },
-                            { text: '2022-2023 第一学期', value: 21207 }
-                        ]
+                options: []
+            },
+            async mounted(){
+                //异步加载json数据
+                const req_sem = {
+                    method: "GET"
+                }
+                const url_sem = "/data.json"
+                data_sem = await fetch(url_sem, req_sem).then(response => response.json());
+                console.log(data_sem['zh'])
+                this.options = data_sem['zh']
+
             },
             methods: {
-
                 async fetchData() {
-                    const url = 'http://localhost:3390/fet/'
+                    const url = '/fet/'
                     const req0 = {
                         method: "POST",
                         headers: {

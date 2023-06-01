@@ -142,17 +142,22 @@
                 scoreString: 'Waiting for request...',
                 password: '',
                 percentage: false,
-                options: [
-                            { text: 'Current Semester', value: 0 },
-                            { text: '2023-2024 Second Semester', value: 24700 },
-                            { text: '2023-2024 First Semester', value: 24699 },
-                            { text: '2022-2023 Second Semester', value: 21208 },
-                            { text: '2022-2023 First Semester', value: 21207 }
-                        ]
+                options: []
+            },
+            async mounted(){
+                //异步加载json数据
+                const req_sem = {
+                    method: "GET"
+                }
+                const url_sem = "/data.json"
+                data_sem = await fetch(url_sem, req_sem).then(response => response.json());
+                console.log(data_sem['en'])
+                this.options = data_sem['en']
+
             },
             methods: {
                 async fetchData() {
-                    const url = 'http://localhost:3390/fet/'
+                    const url = '/fet/'
                     const req0 = {
                         method: "POST",
                         headers: {

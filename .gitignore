@@ -9,3 +9,4 @@ test.js
 *.bk
 *.bk2
 temp
+!data.json
