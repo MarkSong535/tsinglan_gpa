@@ -134,6 +134,21 @@
     <script src="/assets/bootstrap/js/bootstrap.min.js"></script>
 
     <script>
+        function getCookie(user) {
+            var cookieArr = document.cookie.split(";");
+            for(var i = 0; i < cookieArr.length; i++) {
+                var cookiePair = cookieArr[i].split("=");
+                if(user == cookiePair[0].trim()) {
+                    return decodeURIComponent(cookiePair[1]);
+                }
+            }
+            return null;
+        }
+        data = document.cookie
+        if(getCookie("read")==null || getCookie("read")=="001"){
+            alert("Recently, this site has received a significant amount of requests and more than 100K of those requests does not have correct user information. This has caused this server to be out of service temporarily. Please enter the correct user information upon using to avoid this site from out of service and complete termination. The present maintainer of this site will pause the maintainance of this site from July 2023 indefinitely.")
+        }
+        document.cookie = "read=002";
         new Vue({
             el: '#app',
             data: {
