@@ -8,25 +8,51 @@
 
 ## Calculate your gpa by yourself
 
-### Install prerequisits
+### Init
+
+Write the `config.json` file according to `config.json.templete`
+
+### Install Prerequisits
+
+Requires nodejs, npm, python, pip
 
 `pip install requirements.txt`
 
-### Run code
+`npm install -g pm2`
 
-`python score.py username semeterid`
+`npm install node-ipinfo`
 
-[Detailed Instructions](https://marksong.tech/works/tls/tls_gpa/)
+### Start Backend
 
-### Calculate using deployed website
+`python db_paid_init.py`
 
-[link to site](https://tsinglan.live)
+`pm2 start http.js`
+
+### Add Blacklist Username
+
+Add the username into a newline of `total_bl`
+
+### Add Whitelist Username
+
+Add the username into a newline of `total_wl`
+
+### Assign User Role
+
+In table `USER`, 9 is admin, 1 is user with access in whitelist mode, 0 is default user, 2 is user onhold (due to frequent access).
+
+### Add/Change Times that the users can Use (in `limit` mode)
+
+`python limit.py + 1` add 1 additional time the user can use
+
+`python limit.py x 1` change to a single time the user can use
 
 ## Contributors:
 
 [@Mark Song](https://marksong.tech) the owner of this repository, middleware and backend developer.
 
 [@Bruno Chen](https://github.com/BChen233) Frontend Developer
+
+[@Neyoki](https://github.com/NeyokiCat) Maintainance of code
 
 
 
