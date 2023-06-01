@@ -8,7 +8,7 @@
 
 ## Calculate your gpa by yourself
 
-### Init
+### [Init](config.md)
 
 Write the `config.json` file according to `config.json.templete`
 
@@ -38,13 +38,19 @@ Add the username into a newline of `total_wl`
 
 ### Assign User Role
 
-In table `USER`, 9 is admin, 1 is user with access in whitelist mode, 0 is default user, 2 is user onhold (due to frequent access).
+In table `USER`, 9 is admin, 1 is user with access in whitelist mode, 0 is default user, 2 is user onhold (due to frequent access), 3 is blocked user.
 
 ### Add/Change Times that the users can Use (in `limit` mode)
 
 `python limit.py + 1` add 1 additional time the user can use
 
 `python limit.py x 1` change to a single time the user can use
+
+### Sync school semester data
+
+Download [`GetSchoolSemesters`](https://tsinglanstudent.schoolis.cn/api/School/GetSchoolSemesters) from schoolis.
+
+Run `python raw_to_data.py`
 
 ## Contributors:
 
