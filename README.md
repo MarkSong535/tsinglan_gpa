@@ -48,7 +48,7 @@ In table `USER`, 9 is admin, 1 is user with access in whitelist mode, 0 is defau
 
 ### Sync school semester data
 
-Download [`GetSchoolSemesters`](https://tsinglanstudent.schoolis.cn/api/School/GetSchoolSemesters) from schoolis.
+Download [`GetSchoolSemesters`](https://tsinglanstudent.schoolis.cn/api/School/GetSchoolSemesters) from schoolis and put it into the same directory as `score.py`.
 
 Run `python raw_to_data.py`
 
