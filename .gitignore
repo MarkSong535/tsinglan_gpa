@@ -10,3 +10,4 @@ test.js
 *.bk2
 temp
 !data.json
+config.py

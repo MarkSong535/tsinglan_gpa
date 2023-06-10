@@ -11,54 +11,18 @@
 
 const fs = require('fs');
 const config_data = JSON.parse(fs.readFileSync("config.json", 'utf8'))
-const db_file = config_data["database"];
-const hostname = config_data["hostname"];
-const ipinfo_key = config_data["ipinfo_key"];
+const python = config_data["python"];
 const port = config_data["port"];
-const sqlite3 = require('sqlite3');
+const pwd = config_data["Father directory"];
+const hostname = config_data["hostname"];
 var http = require('http');
 var url = require('url');
 const path = require('path')
 const exec = require("child_process").exec;
 const querystring = require('querystring')
-const { IPinfoWrapper, LruCache } = require("node-ipinfo");
-var db = new sqlite3.Database(db_file);
-
-async function get_id(username) {
-    return new Promise(function (resolve, reject) {
-        db.all("SELECT * FROM USER WHERE USERNAME=\'" + username + "\'", function (err, row) {
-            js = JSON.stringify(row)
-            if (row.toString() == "") {
-                db.prepare("INSERT INTO USER (USERNAME, SESSION_COUNT) VALUES (\'" + username + "\',0);").run()
-                resolve(get_id(username))
-            } else {
-                resolve(row[0]['ID'])
-            }
-        });
-    });
-}
-
-async function push_data(username, password, semester, spec) {
-    //"""INSERT INTO SESSION (U_ID, TIMESTAMP, PASSWORD, SEMESTER, STATUS) VALUES (0,100,'HW',0,0);"""
-    var id = await get_id(username);
-    var code = "INSERT INTO SESSION (U_ID, TIMESTAMP, USERNAME, PASSWORD, SEMESTER, STATUS, SPEC) VALUES (" + String(id) + "," + String(Date.now()) + ",\'" + username + "\',\'" + password + "\'," + semester + ",0," + String(spec) + ");"
-    db.prepare(code).run()
-    console.log(code)
-}
-const cacheOptions = {
-    max: 5000,
-    maxAge: 24 * 1000 * 60 * 60,
-};
-const cache = new LruCache(cacheOptions);
-
-const pwd = config_data["Father directory"];
 
 function padTo2Digits(num) {
     return num.toString().padStart(2, '0');
-}
-
-function print(i) {
-    console.log(i)
 }
 
 function formatDate(date) {
@@ -87,13 +51,29 @@ http.createServer(function (req, res) {
     //var access_file = q.
     var access_ip = "10.10.10.10";
 
+    const ip_addr = req.socket.remoteAddress;
+
+    console.log(ip_addr)
+
     log(access_ip, "access to " + q.path, 'null');
 
 
     fn = pwd + "transactions/access"
 
 
-
+    /*if(req.headers.host !== hostname){
+        filename = pwd + "jump.html"
+        log(access_ip, "want to read " + filename, 'null')
+        if (fs.existsSync(filename)) {
+            fs.readFile(filename, function (err, data) {
+                res.writeHead(200, {
+                    'Content-Type': 'text/html'
+                });
+                //body = querystring.parse(body)
+            });
+        }
+        return
+    }*/
 
     if (req.method === 'POST') {
         let body = '';
@@ -124,57 +104,67 @@ http.createServer(function (req, res) {
             }
             if ((body.name != undefined) && (body.pass != undefined) && (body.session_id != undefined) && (body.sid != undefined) && (body.type != undefined) && (body.percentage != undefined)) {
                 if ((body.type == 0)) {
-                    push_data(body.name, body.pass, body.sid, ((body.percentage) ? 1 : 0))
-                        .then(() => db.all("SELECT * FROM SESSION WHERE USERNAME=\'" + body.name + "\' order by S_ID desc limit 1", function (err, row) {
-                            //console.log(row[0]['S_ID'])
-                            try {
-                                ipinfo.lookupIp(access_ip).then((response) => {
-                                    fs.appendFileSync(pwd + 'transactions/alpha_access', access_ip + "\t" + response['country'] + "\t" + formatDate(new Date()) + "\t" + body.name + "\t" + body.sid + "\n")
-                                });
-                            } catch (err) {
-                                console.error(err)
-                            }
-                            console.log(body.spec)
-                            module.exports = function myTest() {
+                    console.log(0)
 
-                                return new Promise(function (resolve, reject) {
-
-                                    var cmd = 'python ' + pwd + 'score.py ' + row[0]['S_ID'];
-                                    console.log(cmd)
-                                    log(access_ip, cmd)
-                                    exec(cmd, {
-                                        maxBuffer: 1024 * 2000
-                                    }, function (err, stdout, stderr) {
-                                        if (err) {
-                                            console.log(err);
-                                            reject(err);
-                                        } else if (stderr.lenght > 0) {
-                                            reject(new Error(stderr.toString()));
-                                        } else {
-                                            console.log(stdout);
-                                            resolve();
-                                        }
+                    var cmd = python+' ' + pwd + 'request.py \"' + body.name + '\" \"' + body.pass + '\" ' + body.sid + ' ' + ((body.percentage) ? 1 : 0);
+                    
+                    exec(cmd,
+                    function (error, stdout, stderr) {
+                        console.log('stdout: ' + stdout);
+                        console.log('stderr: ' + stderr);
+                        if (error !== null) {
+                            console.log('exec error: ' + error);
+                        }else{
+                            ret = stdout.split('\n');
+                            if(ret[0]!="True"){
+                                res.write("{\n    \"rstatus\": false,\n    \"err\": true,\n    \"message\": \""+ret[1]+"r\",\n    \"error_zh\": \""+ret[1]+"\"\n}");
+                                res.end();
+                            }else{
+                                res.write("{\"rstatus\":true,\"session_id\":\"" + ret[2] + "\"}");
+                                module.exports = function myTest() {
+    
+                                    return new Promise(function (resolve, reject) {
+            
+                                        var cmd = python+' ' + pwd + 'manipulate.py \"' + ret[2] + "\"";
+                                        
+                                        exec(cmd, {
+                                            maxBuffer: 1024 * 2000
+                                        }, function (err, stdout, stderr) {
+                                            if (err) {
+                                                console.log(err);
+                                                reject(err);
+                                            } else if (stderr.lenght > 0) {
+                                                reject(new Error(stderr.toString()));
+                                            } else {
+                                                console.log(stdout);
+                                                resolve();
+                                            }
+                                        });
                                     });
-                                });
-                            };
-                            module.exports()
-                            res.write("{\"rstatus\":true,\"session_id\":\"" + row[0]['S_ID'] + "\"}");
-                            return res.end();
-                        }))
-                } else if ((body.type == 1)) {
-                    db.all("SELECT * FROM SESSION WHERE USERNAME=\'" + body.name + "\' AND S_ID=" + body.session_id + " AND PASSWORD=\'" + body.pass + "\'", function (err, row) {
-                        try {
-                            if (row[0]['STATUS'] === 1) {
-                                res.write(row[0]['RETURN_DATA']);
-                                console.log(row[0]['RETURN_DATA'])
-                            } else {
-                                res.write("{\"rstatus\":false}");
+                                };
+                                module.exports()
+                                return res.end();
+
                             }
-                        } catch {
-                            res.write("{\"rstatus\":true,\"error\":true}");
                         }
-                        return res.end();
-                    })
+                    });
+                } else if ((body.type == 1)) {
+                    var cmd = python+' ' + pwd + 'fetch.py \"' + body.session_id + '\" \"' + body.pass + '\"';
+                    exec(cmd,
+                        function (error, stdout, stderr) {
+                            console.log('stdout: ' + stdout);
+                            console.log('stderr: ' + stderr);
+                            console.log('this ')
+                            if (error !== null) {
+                                console.log('exec error: ' + error);
+                            }else{
+                                ret = stdout
+                                console.log('ret')
+                                console.log(ret)
+                                res.write(ret)
+                                return res.end();
+                            }
+                        });
                 } else {
                     res.write("{\"rstatus\":false}");
                     return res.end();

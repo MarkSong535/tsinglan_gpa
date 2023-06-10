@@ -179,6 +179,7 @@
             },
             methods: {
                 async fetchData() {
+                    document.getElementById("score_table").innerHTML = "";
                     const url = '/fet/'
                     const req0 = {
                         method: "POST",
