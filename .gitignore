@@ -1,12 +1,3 @@
-test.py
-/transactions/
-*.json
-/node_modules/
-test.js
-/py_db/
-/database/
-/__*
-*.bk
-*.bk2
-temp
-!data.json
+config.*
+!config.py.templete
+!config.json.templete

@@ -1,5 +1,5 @@
 {
-    "en":[
+    "en": [
         {
             "text": "Current Semester",
             "value": 0
@@ -19,28 +19,156 @@
         {
             "text": "2022-2023 First Semester",
             "value": 21207
+        },
+        {
+            "text": "2021-2022 Second Semester",
+            "value": 18066
+        },
+        {
+            "text": "2021-2022 First Semester",
+            "value": 18065
+        },
+        {
+            "text": "2020-2021 Second Semester",
+            "value": 11164
+        },
+        {
+            "text": "2020-2021 First Semester",
+            "value": 11163
+        },
+        {
+            "text": "2019-2020 Second Semester",
+            "value": 3728
+        },
+        {
+            "text": "2019-2020 First Semester",
+            "value": 3727
+        },
+        {
+            "text": "2018-2019 Second Semester",
+            "value": 1578
+        },
+        {
+            "text": "2018-2019 First Semester",
+            "value": 1577
+        },
+        {
+            "text": "2017-2018 Second Semester",
+            "value": 1576
+        },
+        {
+            "text": "2017-2018 First Semester",
+            "value": 1575
+        },
+        {
+            "text": "2016-2017 Second Semester",
+            "value": 1574
+        },
+        {
+            "text": "2016-2017 First Semester",
+            "value": 1573
+        },
+        {
+            "text": "2015-2016 Second Semester",
+            "value": 1572
+        },
+        {
+            "text": "2015-2016 First Semester",
+            "value": 1571
+        },
+        {
+            "text": "2014-2015 Second Semester",
+            "value": 1570
+        },
+        {
+            "text": "2014-2015 First Semester",
+            "value": 1569
         }
     ],
-    "zh":[
+    "zh": [
         {
-            "text": "当前学期",
+            "text": "\u5f53\u524d\u5b66\u671f",
             "value": 0
         },
         {
-            "text": "2023-2024 第二学期",
+            "text": "2023-2024 \u7b2c2\u5b66\u671f",
             "value": 24700
         },
         {
-            "text": "2023-2024 第一学期",
+            "text": "2023-2024 \u7b2c1\u5b66\u671f",
             "value": 24699
         },
         {
-            "text": "2022-2023 第二学期",
+            "text": "2022-2023 \u7b2c2\u5b66\u671f",
             "value": 21208
         },
         {
-            "text": "2022-2023 第一学期",
+            "text": "2022-2023 \u7b2c1\u5b66\u671f",
             "value": 21207
+        },
+        {
+            "text": "2021-2022 \u7b2c2\u5b66\u671f",
+            "value": 18066
+        },
+        {
+            "text": "2021-2022 \u7b2c1\u5b66\u671f",
+            "value": 18065
+        },
+        {
+            "text": "2020-2021 \u7b2c2\u5b66\u671f",
+            "value": 11164
+        },
+        {
+            "text": "2020-2021 \u7b2c1\u5b66\u671f",
+            "value": 11163
+        },
+        {
+            "text": "2019-2020 \u7b2c2\u5b66\u671f",
+            "value": 3728
+        },
+        {
+            "text": "2019-2020 \u7b2c1\u5b66\u671f",
+            "value": 3727
+        },
+        {
+            "text": "2018-2019 \u7b2c2\u5b66\u671f",
+            "value": 1578
+        },
+        {
+            "text": "2018-2019 \u7b2c1\u5b66\u671f",
+            "value": 1577
+        },
+        {
+            "text": "2017-2018 \u7b2c2\u5b66\u671f",
+            "value": 1576
+        },
+        {
+            "text": "2017-2018 \u7b2c1\u5b66\u671f",
+            "value": 1575
+        },
+        {
+            "text": "2016-2017 \u7b2c2\u5b66\u671f",
+            "value": 1574
+        },
+        {
+            "text": "2016-2017 \u7b2c1\u5b66\u671f",
+            "value": 1573
+        },
+        {
+            "text": "2015-2016 \u7b2c2\u5b66\u671f",
+            "value": 1572
+        },
+        {
+            "text": "2015-2016 \u7b2c1\u5b66\u671f",
+            "value": 1571
+        },
+        {
+            "text": "2014-2015 \u7b2c2\u5b66\u671f",
+            "value": 1570
+        },
+        {
+            "text": "2014-2015 \u7b2c1\u5b66\u671f",
+            "value": 1569
         }
     ]
 }

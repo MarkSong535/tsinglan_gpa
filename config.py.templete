@@ -1,0 +1,21 @@
+import os
+
+settings = {
+    "host": os.environ.get("ACCOUNT_HOST", ""),
+    "master_key": os.environ.get(
+        "ACCOUNT_KEY",
+        "",
+    ),
+    "database_prefix": os.environ.get("COSMOS_DATABASE_PREFIX", ""),
+    "container_prefix": os.environ.get("COSMOS_CONTAINER", ""),
+    "mode": os.environ.get("MODE", ""),
+    "onhold_threshold": os.environ.get("ONHOLD_THRESHOLD", ),
+    "normal_limit": os.environ.get("NORMAL_LIMIT", ),
+    "onhold_limit": os.environ.get("ONHOLD_LIMIT", ),
+    "suffix": os.environ.get("SUFFIX", ""),
+    "enc_key": os.environ.get(
+        "ENCRYPTION_KEY",
+        "",
+    ),
+    "server_host": os.environ.get("SERVER_HOSTNAME", ""),
+}
